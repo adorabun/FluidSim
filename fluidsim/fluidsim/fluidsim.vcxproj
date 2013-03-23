@@ -11,11 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\fluidSim.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\particleSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\fluidSim.h" />
     <ClInclude Include="Source\math_headers.h" />
     <ClInclude Include="Source\openGL_headers.h" />
+    <ClInclude Include="Source\particleSystem.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\frag.glsl" />
+    <None Include="Shader\vert.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{205B8D7E-7B2F-44BC-9297-2E4F200AD31E}</ProjectGuid>

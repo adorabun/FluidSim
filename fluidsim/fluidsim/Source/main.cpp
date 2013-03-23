@@ -1,7 +1,7 @@
 #include <iostream>
 #include "openGL_headers.h"
 #include "math_headers.h"
-
+#include "particleSystem.h"
 
 int window_width = 1024;
 int window_height = 768;
@@ -27,7 +27,7 @@ GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 //----------Camera Control----------//
 float eye_distance = 20.0f;
 float head = 45.0f, pitch = 45.0f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 4.0f, 0.0f);
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 0.0f, 0.0f);
 
 //----------functions----------//
 // declare
@@ -312,6 +312,7 @@ int main(int argc, char** argv)
    // ClothSim cloth_sim(10);
     // TODO: change here if you want to modify the dimension.
   //  cloth_sim.initialize(40, 40, glm::vec3(-5.0f, 10.0f, -5.0f), glm::vec3(5.0f, 10.0f, 5.0f));
+	particleSystem ps(10);
 
     lastTime = glfwGetTime();
     while(run)
@@ -320,16 +321,17 @@ int main(int argc, char** argv)
 
         aimCamera();
 
-        if(!pause)
+       /* if(!pause)
             cloth_sim.update(&scene, 0.006325f);
         if(flip_draw_mode)
         {
             cloth_sim.flip_draw_mode();
             flip_draw_mode = false;
-        }
+        }*/
         activate_shaderprog(m_shaderprog_handle);
-        cloth_sim.draw(vbo_handle);
-        scene.draw(vbo_handle);
+       /* cloth_sim.draw(vbo_handle);
+        scene.draw(vbo_handle);*/
+		ps.Draw(vbo_handle);
         deactivate_shaderprog(m_shaderprog_handle);
 
         drawAxes();
