@@ -15,7 +15,7 @@ public:
 	particle(glm::vec3 position);
 
 	void Draw(const VBO& vbos, float r, int nSlice, int nStack);
-
+	void Draw2(const VBO& vbos, float r, int nSlice, int nStack);
 	float mass;
 	glm::vec3 pos;
 	glm::vec3 vel;
@@ -34,6 +34,10 @@ public:
 	float temperature;
 
 protected:
+		std::vector<glm::vec3> m_positions;
+		std::vector<glm::vec3> m_normals;
+		std::vector<glm::vec3> m_colors;
+		std::vector<unsigned short> m_indices;
 };
 
 class particleSystem

@@ -1,4 +1,4 @@
-﻿Build started 3/23/2013 6:07:04 PM.
+﻿Build started 3/27/2013 2:11:17 PM.
      1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\fluidsim.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -8,14 +8,12 @@
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_integer.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(32): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(33): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(64): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(65): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(66): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(68): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(69): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(70): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(78): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(88): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(111): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(164): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(165): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(240): warning C4305: '=' : truncation from 'double' to 'float'
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
@@ -36,4 +34,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.27
+Time Elapsed 00:00:01.15

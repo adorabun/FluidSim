@@ -307,12 +307,9 @@ int main(int argc, char** argv)
     glViewport(0, 0, window_width, window_height);
 
     VBO vbo_handle;
-    //Scene scene("../Scene/test_scene.xml");
-    // TODO: change here if you want to use a smaller iteration number.
-   // ClothSim cloth_sim(10);
-    // TODO: change here if you want to modify the dimension.
-  //  cloth_sim.initialize(40, 40, glm::vec3(-5.0f, 10.0f, -5.0f), glm::vec3(5.0f, 10.0f, 5.0f));
-	particleSystem ps(10);
+
+	particleSystem ps(15);
+
 
     lastTime = glfwGetTime();
     while(run)
@@ -329,14 +326,14 @@ int main(int argc, char** argv)
             flip_draw_mode = false;
         }*/
         activate_shaderprog(m_shaderprog_handle);
-       /* cloth_sim.draw(vbo_handle);
-        scene.draw(vbo_handle);*/
+    
 		ps.Draw(vbo_handle);
+		
         deactivate_shaderprog(m_shaderprog_handle);
 
         drawAxes();
-        if(!pause && record)
-            grabScreen();
+       // if(!pause && record)
+         //   grabScreen();
         frame_num++;
 
         now = glfwGetTime();
