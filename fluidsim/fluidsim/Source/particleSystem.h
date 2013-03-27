@@ -14,12 +14,18 @@ public:
 
 	particle(glm::vec3 position);
 
+	particle(const particle& p);
+    particle& operator=(const particle& p);
+
 	void Draw(const VBO& vbos, float r, int nSlice, int nStack);
 	void Draw2(const VBO& vbos, float r, int nSlice, int nStack);
+	
 	float mass;
+	
 	glm::vec3 pos;
 	glm::vec3 vel;
-	glm::vec3 accel;
+
+	glm::vec3 force;
 	 
 	float rest_density;
 	float actual_density;
@@ -45,12 +51,16 @@ class particleSystem
 public:
 	particleSystem();
 	particleSystem(int number);
+
 	void Draw(const VBO& vbos);
-	void LeapfrogIntegrate();
+	void LeapfrogIntegrate(float dt);
+
+	typedef std::vector<particle> particleGrid;
 
 private:
 	void initParticles(int number);
-	std::vector<particle> particles;
+	
+	particleGrid particles;
 	float radius;
 
 	

@@ -4,7 +4,7 @@ particle::particle(){
 		
 		mass = 1.f;
 		vel = glm::vec3(0.0);
-		accel = glm::vec3(0.0);
+		
 		rest_density = 1.0;
 		actual_density = 1.0;
 		viscosity = 1;
@@ -18,9 +18,11 @@ particle::particle(glm::vec3 position){
 		
 		mass = 1.f;
 
+		force = glm::vec3(0,9.8f,0);
+
 		pos = position;
 		vel = glm::vec3(0.0);
-		accel = glm::vec3(0.0);
+
 		rest_density = 1.0;
 		actual_density = 1.0;
 		viscosity = 1;
@@ -30,6 +32,55 @@ particle::particle(glm::vec3 position){
 		color_surface =  glm::vec3(1,1,1);
 		
 	}
+
+particle::particle(const particle& p) 
+{
+	mass = p.mass;
+	pos = p.pos;
+	vel = p.vel;
+	force = p.force;
+	rest_density = p.rest_density;
+	actual_density = p.actual_density;
+
+	viscosity = p.viscosity;
+	gas_constant = p.gas_constant;
+	temperature = p.temperature;
+
+	color_interface = p.color_interface;
+	color_surface = p.color_surface;
+
+	m_positions = p.m_positions;
+	m_normals = p.m_normals;
+	m_colors = p.m_colors;
+	m_indices = p.m_indices;
+
+
+}
+
+particle& particle::operator=(const particle& p)
+{
+    if (&p == this) return *this;
+
+	mass = p.mass;
+	pos = p.pos;
+	vel = p.vel;
+	force = p.force;
+	rest_density = p.rest_density;
+	actual_density = p.actual_density;
+
+	viscosity = p.viscosity;
+	gas_constant = p.gas_constant;
+	temperature = p.temperature;
+
+	color_interface = p.color_interface;
+	color_surface = p.color_surface;
+
+	m_positions = p.m_positions;
+	m_normals = p.m_normals;
+	m_colors = p.m_colors;
+	m_indices = p.m_indices;
+    return *this;
+}
 
 void particle::Draw2(const VBO& vbos, float r, int nSlice, int nStack){
 	m_positions.clear();
@@ -232,6 +283,8 @@ void particle::Draw(const VBO& vbos, float r, int nSlice, int nStack){
    // glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+
+
 //////////////////////ParticleSystem/////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 particleSystem::particleSystem(){
@@ -253,12 +306,21 @@ void particleSystem::initParticles(int number){
 }
 
 void particleSystem::Draw(const VBO& vbos){
+	LeapfrogIntegrate(0.01);
 	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it)
-		it->Draw2(vbos, radius, 4, 4);
+		it->Draw2(vbos, radius, 6, 6);
 }
 
-void particleSystem::LeapfrogIntegrate(){
-	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it){
-	
+void particleSystem::LeapfrogIntegrate(float dt){
+	float halfdt = 0.5 * dt;
+	particleGrid target = particles;// target is a copy!
+	for (int i=0; i < target.size(); i++){
+		target[i].pos = particles[i].pos + particles[i].vel * dt + halfdt * dt * particles[i].force * 1.f / particles[i].mass;
 	}
+
+	for (int i=0; i < target.size(); i++){
+		particles[i].vel += halfdt * (target[i].force  + particles[i].force) * 1.f / particles[i].mass;
+		particles[i].pos = target[i].pos;
+	}
+
 }

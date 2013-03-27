@@ -25,8 +25,8 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 20.0f;
-float head = 45.0f, pitch = 45.0f;
+float eye_distance = 16.f;
+float head = 45.f, pitch = 45.f;
 glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 0.0f, 0.0f);
 
 //----------functions----------//
@@ -308,7 +308,7 @@ int main(int argc, char** argv)
 
     VBO vbo_handle;
 
-	particleSystem ps(15);
+	particleSystem ps(10);
 
 
     lastTime = glfwGetTime();
