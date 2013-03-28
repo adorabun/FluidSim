@@ -17,8 +17,6 @@ public:
 	particle(const particle& p);
     particle& operator=(const particle& p);
 
-	void Draw(const VBO& vbos);
-
 	float mass;
 	
 	glm::vec3 pos;
@@ -38,13 +36,8 @@ public:
 
 	float temperature;
 
-	
 protected:
-	void initSphere();
-	std::vector<glm::vec3> m_positions;
-	std::vector<glm::vec3> m_normals;
-	std::vector<glm::vec3> m_colors;
-	std::vector<unsigned short> m_indices;
+
 };
 
 class particleSystem
@@ -60,9 +53,13 @@ public:
 
 private:
 	void initParticles(int number);
-	
+private:
 	particleGrid particles;
-
+	void initSphere();
+	std::vector<glm::vec3> m_positions;
+	std::vector<glm::vec3> m_normals;
+	std::vector<glm::vec3> m_colors;
+	std::vector<unsigned short> m_indices;
 	
 	
 };

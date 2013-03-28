@@ -16,8 +16,6 @@ particle::particle(){
 		temperature = 100;		
 		color_interface = glm::vec3(1,1,1);
 		color_surface =  glm::vec3(1,1,1);
-
-		initSphere();
 	}
 
 particle::particle(glm::vec3 position){
@@ -37,7 +35,6 @@ particle::particle(glm::vec3 position){
 		color_interface = glm::vec3(0,1,0);
 		color_surface =  glm::vec3(1,0,1);
 
-		initSphere();
 		
 	}
 
@@ -57,12 +54,6 @@ particle::particle(const particle& p)
 	color_interface = p.color_interface;
 	color_surface = p.color_surface;
 
-	m_positions = p.m_positions;
-	m_normals = p.m_normals;
-	m_colors = p.m_colors;
-	m_indices = p.m_indices;
-
-	initSphere();
 }
 
 particle& particle::operator=(const particle& p)
@@ -83,103 +74,9 @@ particle& particle::operator=(const particle& p)
 	color_interface = p.color_interface;
 	color_surface = p.color_surface;
 
-	m_positions = p.m_positions;
-	m_normals = p.m_normals;
-	m_colors = p.m_colors;
-	m_indices = p.m_indices;
-
-	initSphere();
     return *this;
 }
 
-void particle::initSphere(){
-
-	float phi   = 2.f * M_PI /(float)(nSlice-1);
-	float theta = M_PI /(float)(nStack-1);
-
-
-	int count = nSlice*nStack;
-
-	m_positions.resize( count );
-	m_normals.resize( count );
-	m_colors.resize( count );
-	m_indices.resize( count * 6 );
-
-	for(int i = 0; i < nStack; i++)
-		for(int j = 0; j < nSlice; j++){
-
-			float x = sin(j*phi) * cos(i*theta);
-			float y = sin(j*phi) * sin(i*theta);
-			float z = cos(j*phi);
-
-			int index = i*nSlice+j;
-			m_positions[index] = glm::vec3(x, y, z) * radius;
-			m_normals[index] = glm::vec3(x, y, z);
-			m_colors[index] = color_surface;
-		}
-
-	for(int i = 0; i < nStack-1; i++)
-		for(int j = 0; j < nSlice-1; j++){
-			int index = (i*(nSlice-1)+j)*6;
-			m_indices[index    ] = i * nSlice + j;
-			m_indices[index + 1] = i * nSlice + j + 1;
-			m_indices[index + 2] = (i+1) * nSlice + j + 1;
-
-			m_indices[index + 3] = (i+1) * nSlice + j;
-			m_indices[index + 4] = i * nSlice + j;
-			m_indices[index + 5] = (i+1) * nSlice + j + 1;	
-	}
-
-}
-
-void particle::Draw(const VBO& vbos){
-	for(int i = 0; i < nStack; i++)
-		for(int j = 0; j < nSlice; j++){
-			m_positions[i*nSlice+j] += pos;
-	}
-	 // position
-    glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3 * m_positions.size() * sizeof(float), &m_positions[0], GL_STREAM_DRAW);
-
-    // color
-    glBindBuffer(GL_ARRAY_BUFFER, vbos.m_cbo);
-    glBufferData(GL_ARRAY_BUFFER, 3 * m_colors.size() * sizeof(float), &m_colors[0], GL_STREAM_DRAW);
-
-    // normal
-    glBindBuffer(GL_ARRAY_BUFFER, vbos.m_nbo);
-    glBufferData(GL_ARRAY_BUFFER, 3 * m_normals.size() * sizeof(float), &m_normals[0], GL_STREAM_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.m_ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned short), &m_indices[0], GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbos.m_cbo);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbos.m_nbo);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.m_ibo);
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_SHORT, 0);//GL_UNSIGNED_INT
-
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	for(int i = 0; i < nStack; i++)
-		for(int j = 0; j < nSlice; j++){
-			m_positions[i*nSlice+j] -= pos;
-	}
-}
 
 
 //////////////////////ParticleSystem/////////////////////////////////
@@ -207,12 +104,105 @@ void particleSystem::initParticles(int number){
 
 				particles[ x*number*number + y*number + z] = p;
 			}
+
+	initSphere();
+}
+
+void particleSystem::initSphere(){
+
+	float phi   = 2.f * M_PI /(float)(nSlice-1);
+	float theta = M_PI /(float)(nStack-1);
+
+
+	int count = nSlice*nStack;
+
+	m_positions.resize( count );
+	m_normals.resize( count );
+	m_colors.resize( count );
+	m_indices.resize( count * 6 );
+
+	for(int i = 0; i < nStack; i++)
+		for(int j = 0; j < nSlice; j++){
+
+			float x = sin(j*phi) * cos(i*theta);
+			float y = sin(j*phi) * sin(i*theta);
+			float z = cos(j*phi);
+
+			int index = i*nSlice+j;
+			m_positions[index] = glm::vec3(x, y, z) * radius;
+			m_normals[index] = glm::vec3(x, y, z);
+		}
+
+	for(int i = 0; i < nStack-1; i++)
+		for(int j = 0; j < nSlice-1; j++){
+			int index = (i*(nSlice-1)+j)*6;
+			m_indices[index    ] = i * nSlice + j;
+			m_indices[index + 1] = i * nSlice + j + 1;
+			m_indices[index + 2] = (i+1) * nSlice + j + 1;
+
+			m_indices[index + 3] = (i+1) * nSlice + j;
+			m_indices[index + 4] = i * nSlice + j;
+			m_indices[index + 5] = (i+1) * nSlice + j + 1;	
+	}
+
 }
 
 void particleSystem::Draw(const VBO& vbos){
 	LeapfrogIntegrate(0.01);
-	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it)
-		it->Draw(vbos);
+	int index;
+
+	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it){
+
+		for(int i = 0; i < nStack; i++)
+			for(int j = 0; j < nSlice; j++){
+				index = i*nSlice+j;
+				m_positions[index] += (it->pos);
+				m_colors[index] = it->color_surface;
+			}
+		 // position
+		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
+		glBufferData(GL_ARRAY_BUFFER, 3 * m_positions.size() * sizeof(float), &m_positions[0], GL_STREAM_DRAW);
+
+		// color
+		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_cbo);
+		glBufferData(GL_ARRAY_BUFFER, 3 * m_colors.size() * sizeof(float), &m_colors[0], GL_STREAM_DRAW);
+
+		// normal
+		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_nbo);
+		glBufferData(GL_ARRAY_BUFFER, 3 * m_normals.size() * sizeof(float), &m_normals[0], GL_STREAM_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.m_ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned short), &m_indices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_cbo);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_nbo);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.m_ibo);
+		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_SHORT, 0);//GL_UNSIGNED_INT
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		for(int i = 0; i < nStack; i++)
+			for(int j = 0; j < nSlice; j++){
+				m_positions[i*nSlice+j] -= (it->pos);
+		}
+
+	}
 }
 
 void particleSystem::LeapfrogIntegrate(float dt){
