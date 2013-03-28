@@ -25,8 +25,8 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 20.f;
-float head = 45.f, pitch = 45.f;
+float eye_distance = 30.f;
+float head = 30.f, pitch = 45.f;
 glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 0.0f, 0.0f);
 
 //----------functions----------//
@@ -308,8 +308,8 @@ int main(int argc, char** argv)
 
     VBO vbo_handle;
 
-	particleSystem ps(10);
-
+	particleSystem ps(20);
+	
 
     lastTime = glfwGetTime();
     while(run)
@@ -326,9 +326,11 @@ int main(int argc, char** argv)
             flip_draw_mode = false;
         }*/
         activate_shaderprog(m_shaderprog_handle);
-    
-		ps.Draw(vbo_handle);
 		
+		
+		ps.Draw(vbo_handle);
+		ps.drawWireGrid();
+
         deactivate_shaderprog(m_shaderprog_handle);
 
         drawAxes();

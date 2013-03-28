@@ -48,20 +48,28 @@ public:
 
 	void Draw(const VBO& vbos);
 	void LeapfrogIntegrate(float dt);
+	void drawWireGrid();
 
 	typedef std::vector<particle> particleGrid;
 
 private:
 	void initParticles(int number);
+	void initSphere();
+	
 private:
 	particleGrid particles;
-	void initSphere();
+
 	std::vector<glm::vec3> m_positions;
 	std::vector<glm::vec3> m_normals;
 	std::vector<glm::vec3> m_colors;
 	std::vector<unsigned short> m_indices;
 	
-	
+	double xstart;
+	double ystart;
+	double zstart;
+	double xend;
+	double yend;
+	double zend;
 };
 
 #endif

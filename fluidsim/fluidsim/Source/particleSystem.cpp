@@ -21,7 +21,6 @@ particle::particle(){
 particle::particle(glm::vec3 position){
 		
 		mass = 1.f;
-
 		force = glm::vec3(0,-9.8f,0);
 
 		pos = position;
@@ -33,7 +32,7 @@ particle::particle(glm::vec3 position){
 		gas_constant = 1;
 		temperature = 100;
 		color_interface = glm::vec3(0,1,0);
-		color_surface =  glm::vec3(1,0,1);
+		color_surface =  glm::vec3(0,0,1);
 
 		
 	}
@@ -82,12 +81,19 @@ particle& particle::operator=(const particle& p)
 //////////////////////ParticleSystem/////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 particleSystem::particleSystem(){
+
 }
 
 particleSystem::particleSystem(int number){
-	
-	initParticles(number);
+	xstart = -3.0;
+	ystart = -3.0;
+	zstart = -3.0;
+	xend = 9.0;
+	yend = 9.0;
+	zend = 9.0;
 
+	initParticles(number);
+	initSphere();
 }
 
 void particleSystem::initParticles(int number){
@@ -100,12 +106,10 @@ void particleSystem::initParticles(int number){
 		for(int y = 0; y < number; y++)
 			for(int z = 0; z < number; z++){
 
-				particle p(glm::vec3(x, y, z) * stepsize);
+				particle p(glm::vec3(x, y, z) * stepsize + glm::vec3(radius));
 
 				particles[ x*number*number + y*number + z] = p;
 			}
-
-	initSphere();
 }
 
 void particleSystem::initSphere(){
@@ -148,6 +152,7 @@ void particleSystem::initSphere(){
 }
 
 void particleSystem::Draw(const VBO& vbos){
+	
 	LeapfrogIntegrate(0.01);
 	int index;
 
@@ -212,9 +217,65 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		target[i].pos = particles[i].pos + particles[i].vel * dt + halfdt * dt * particles[i].force * 1.f / particles[i].mass;
 	}
 
+	//recalculate force
+
 	for (int i=0; i < target.size(); i++){
 		particles[i].vel += halfdt * (target[i].force  + particles[i].force) * 1.f / particles[i].mass;
 		particles[i].pos = target[i].pos;
 	}
 
+}
+
+void particleSystem::drawWireGrid()
+{
+   // Display grid in light grey, draw top & bottom
+
+
+
+   glPushAttrib(GL_LIGHTING_BIT | GL_LINE_BIT);
+      glDisable(GL_LIGHTING);
+      glColor3f(0.25, 0.25, 0.25);
+
+      glBegin(GL_LINES);
+	  
+	  glVertex3d(xstart, ystart, zstart);
+	  glVertex3d(xend, ystart, zstart);
+
+	  glVertex3d(xstart, yend, zstart);
+	  glVertex3d(xend, yend, zstart);
+
+	  glVertex3d(xstart, ystart, zend);
+	  glVertex3d(xend, ystart, zend);
+
+	  glVertex3d(xstart, yend, zend);
+	  glVertex3d(xend, yend, zend);
+
+	  glVertex3d(xstart, ystart, zstart);
+	  glVertex3d(xstart, ystart, zend);
+
+	   glVertex3d(xend, ystart, zstart);
+	   glVertex3d(xend, ystart, zend);
+
+
+	   glVertex3d(xstart, yend, zstart);
+	   glVertex3d(xstart, yend, zend);
+
+	  glVertex3d(xend, yend, zend);
+	  glVertex3d(xend, yend, zstart);
+
+      glVertex3d(xstart, ystart, zstart);
+      glVertex3d(xstart, yend, zstart);
+
+      glVertex3d(xend, ystart, zstart);
+      glVertex3d(xend, yend, zstart);
+
+      glVertex3d(xstart, ystart, zend);
+      glVertex3d(xstart, yend, zend);
+
+      glVertex3d(xend, ystart, zend);
+      glVertex3d(xend, yend, zend);
+      glEnd();
+   glPopAttrib();
+
+   glEnd();
 }
