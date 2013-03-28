@@ -1,17 +1,9 @@
-﻿Build started 3/28/2013 4:29:55 PM.
+﻿Build started 3/28/2013 4:34:50 PM.
      1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\fluidsim.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\main.cpp Source\particleSystem.cpp
-         main.cpp
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\./core/func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\./core/func_integer.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-     1>Source\main.cpp(343): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
-     1>Source\main.cpp(364): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\particleSystem.cpp
          particleSystem.cpp
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\./core/func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
@@ -38,4 +30,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.50
+Time Elapsed 00:00:01.02

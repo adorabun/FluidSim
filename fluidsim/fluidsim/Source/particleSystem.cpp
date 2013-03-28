@@ -32,7 +32,7 @@ particle::particle(glm::vec3 position){
 		gas_constant = 1;
 		temperature = 100;
 		color_interface = glm::vec3(0,1,0);
-		color_surface =  glm::vec3(0,0,1);
+		color_surface =  glm::vec3(0.22,0.77,1);
 
 		
 	}
@@ -151,6 +151,34 @@ void particleSystem::initSphere(){
 
 }
 
+void particleSystem::LeapfrogIntegrate(float dt){
+	float halfdt = 0.5 * dt;
+	particleGrid target = particles;// target is a copy!
+	for (int i=0; i < target.size(); i++){
+		target[i].pos = particles[i].pos + particles[i].vel * dt + halfdt * dt * particles[i].force / particles[i].mass;
+	}
+
+	//recalculate force
+
+	for (int i=0; i < target.size(); i++){
+		particles[i].vel += halfdt * (target[i].force  + particles[i].force) / particles[i].mass;
+		particles[i].pos = target[i].pos;
+	}
+
+}
+
+void particleSystem::computeAllForces(){
+
+}
+
+void particleSystem::computePressure(){
+}
+void particleSystem::computeViscosity(){
+}
+void particleSystem::computeSurfaceTension(){
+}
+
+///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
 	LeapfrogIntegrate(0.01);
@@ -210,29 +238,13 @@ void particleSystem::Draw(const VBO& vbos){
 	}
 }
 
-void particleSystem::LeapfrogIntegrate(float dt){
-	float halfdt = 0.5 * dt;
-	particleGrid target = particles;// target is a copy!
-	for (int i=0; i < target.size(); i++){
-		target[i].pos = particles[i].pos + particles[i].vel * dt + halfdt * dt * particles[i].force * 1.f / particles[i].mass;
-	}
 
-	//recalculate force
-
-	for (int i=0; i < target.size(); i++){
-		particles[i].vel += halfdt * (target[i].force  + particles[i].force) * 1.f / particles[i].mass;
-		particles[i].pos = target[i].pos;
-	}
-
-}
 
 void particleSystem::drawWireGrid()
 {
    // Display grid in light grey, draw top & bottom
 
-
-
-   glPushAttrib(GL_LIGHTING_BIT | GL_LINE_BIT);
+	  glPushAttrib(GL_LIGHTING_BIT | GL_LINE_BIT);
       glDisable(GL_LIGHTING);
       glColor3f(0.25, 0.25, 0.25);
 

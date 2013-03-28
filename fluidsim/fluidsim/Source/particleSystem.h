@@ -55,6 +55,11 @@ public:
 private:
 	void initParticles(int number);
 	void initSphere();
+
+	void computeAllForces();
+	void computePressure();
+	void computeViscosity();
+	void computeSurfaceTension();
 	
 private:
 	particleGrid particles;
