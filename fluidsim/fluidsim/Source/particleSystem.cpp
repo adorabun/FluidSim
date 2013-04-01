@@ -136,12 +136,22 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	for (int i=0; i < target.size(); i++){
-		source[i].vel += halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
-		source[i].pos = target[i].pos;
+		if( checkIfOutOfBoundry(source[i]) ){
+			source[i].vel = glm::vec3(0.f);
+		}else{
+			source[i].vel += halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
+			source[i].pos = target[i].pos;
+		}
 	}
 
 }
 
+bool particleSystem::checkIfOutOfBoundry(particle p){
+	glm::vec3 pos = p.pos;
+	if(pos.x < xstart || pos.x > xend || pos.y < ystart || pos.y > yend || pos.z < zstart || pos.z > zend)
+		return true;
+	return false;
+}
 ///////////////////////////////smoothing kernels//////////////////////////////////////
 inline float poly6Kernel(glm::vec3 r, float h){
 	float rLen = glm::length(r);

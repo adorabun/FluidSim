@@ -56,7 +56,8 @@ private:
 	
 	glm::vec3 computeForce(const particleGrid& ps, int index);
 	float computeDensity(const particleGrid& ps, int index);
-	
+	bool checkIfOutOfBoundry(particle p);
+
 private:
 	particleGrid particles;
 
@@ -64,7 +65,7 @@ private:
 	std::vector<glm::vec3> m_normals;
 	std::vector<glm::vec3> m_colors;
 	std::vector<unsigned short> m_indices;
-	
+
 	double xstart;
 	double ystart;
 	double zstart;
