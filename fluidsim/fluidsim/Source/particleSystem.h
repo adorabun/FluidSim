@@ -14,9 +14,6 @@ public:
 
 	particle(glm::vec3 position);
 
-	particle(const particle& p);
-    particle& operator=(const particle& p);
-
 	float mass;
 	
 	glm::vec3 pos;
@@ -26,16 +23,13 @@ public:
 	float rest_density;
 	float actual_density;
 
-	float viscosity_coef;
-
-	float gas_constant;
-
-	
+	float viscosity_coef;//mu
+	float gas_constant;//k
 
 	float temperature;
 
-	glm::vec3 color_interface;
-	glm::vec3 color_surface;
+	float color_interface;//Ci
+	float color_surface;//Cs
 
 	float pressure;
 };
@@ -59,7 +53,6 @@ private:
 	
 	glm::vec3 computeForce(const particleGrid& ps, int index);
 
-	//glm::vec3 computeColor(const particleGrid& ps, int index);
 	float computeDensity(const particleGrid& ps, int index);
 	
 private:

@@ -1,10 +1,11 @@
 #include "particleSystem.h"
 #include <cmath>
-/////////////////////Particle///////////////////////////////////
+
 #define nSlice 6
 #define nStack 6
 #define radius 0.15f
 
+/////////////////////Particle///////////////////////////////////
 particle::particle(){
 
 	}
@@ -17,65 +18,22 @@ particle::particle(glm::vec3 position){
 		pos = position;
 		vel = glm::vec3(0.0);
 
-		rest_density = 1.0;
-		actual_density = 0.0;
+		rest_density = 1.f;
+		actual_density = 1.f;
 
-		viscosity_coef = 1;
-		gas_constant = 1;
+		viscosity_coef = 1.f;
+		gas_constant = 1.f;
 		
 		temperature = 100;
-		color_interface = glm::vec3(0,1,0);
-		color_surface =  glm::vec3(0.22,0.77,1);
+
+		color_interface = 1.f;
+		color_surface = 1.f;
 
 
 	}
 
-particle::particle(const particle& p) 
-{
-	mass = p.mass;
-	pos = p.pos;
-	vel = p.vel;
-	force = p.force;
-	rest_density = p.rest_density;
-	actual_density = p.actual_density;
-
-	viscosity_coef = p.viscosity_coef;
-	gas_constant = p.gas_constant;
-	temperature = p.temperature;
-
-	color_interface = p.color_interface;
-	color_surface = p.color_surface;
-
-	pressure = p.pressure;
-
-}
-
-particle& particle::operator=(const particle& p)
-{
-    if (&p == this) return *this;
-
-	mass = p.mass;
-	pos = p.pos;
-	vel = p.vel;
-	force = p.force;
-	rest_density = p.rest_density;
-	actual_density = p.actual_density;
-
-	viscosity_coef = p.viscosity_coef;
-	gas_constant = p.gas_constant;
-	temperature = p.temperature;
-
-	color_interface = p.color_interface;
-	color_surface = p.color_surface;
-
-	pressure = p.pressure;
-    return *this;
-}
-
-
 
 //////////////////////ParticleSystem/////////////////////////////////
-/////////////////////////////////////////////////////////////////////
 particleSystem::particleSystem(){
 
 }
@@ -152,7 +110,8 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	particleGrid target = particles;// target is a copy!
 
 	for (int i=0; i < target.size(); i++){
-		target[i].pos = particles[i].pos + particles[i].vel * dt + halfdt * dt * particles[i].force / particles[i].mass;
+		target[i].pos = particles[i].pos + particles[i].vel * dt 
+						+ halfdt * dt * particles[i].force / particles[i].actual_density;
 	}
 
 	//calculate actual density 
@@ -167,19 +126,47 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	for (int i=0; i < target.size(); i++){
-		particles[i].vel += halfdt * (target[i].force  + particles[i].force) / particles[i].mass;
+		particles[i].vel += halfdt * (target[i].force/target[i].actual_density  + particles[i].force /particles[i].actual_density);
 		particles[i].pos = target[i].pos;
 	}
 
 }
 
-
-
+///////////////////////////////smoothing kernels//////////////////////////////////////
 inline float poly6Kernel(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen >= 0 || rLen <= h)
-		return 315.f / (64 * M_PI * pow(h,9) ) * pow( h*h-rLen*rLen, 3);
+		return 315.f * pow(h*h-rLen*rLen, 3) / (64.f * M_PI * pow(h,9) ) ;
+	return 0;
+}
+
+inline glm::vec3 poly6KernelGradient(glm::vec3 r, float h){
+	float rLen = glm::length(r);
+
+	if(rLen >= 0 || rLen <= h){
+		float t =  945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
+		return t*r;
+	}
+		
+	return glm::vec3(0.f);
+
+}
+
+inline float poly6KernelLaplacian(glm::vec3 r, float h){
+	float rLen = glm::length(r);
+
+	if(rLen >= 0 || rLen <= h)
+		return 945.f * (h*h - rLen*rLen) * (7.f*rLen*rLen - 3*h*h) / (32.f * M_PI * pow(h,9) );
+		
+	return 0.f;
+}
+
+inline float spikyKernel(glm::vec3 r, float h){
+	float rLen = glm::length(r);
+
+	if(rLen >= 0 || rLen <= h)
+		return 15.f * pow(h - rLen, 3) / ( M_PI * pow(h,6) ) ;
 	return 0;
 }
 
@@ -187,17 +174,28 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 
 	float rLen = glm::length(r);
 	if(rLen >= 0 || rLen <= h){
-		float t = 45.f * (h-rLen) * (h-rLen) / (M_PI * pow(h, 6));
-		return t * glm::normalize(r);
+		float t = 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
+		return t * r;
 	}
 	return glm::vec3(0.f);
 }
 
-inline float viscosityKernelLaplacian(glm::vec3 r, float h){
+inline float viscosityKernel(glm::vec3 r, float h){
+	float rLen = glm::length(r);
 
-	return 45.f * ( h - glm::length(r) ) / ( M_PI + pow(h, 6) ) ;
+	if(rLen >= 0 || rLen <= h)
+		return 15.f * ( - rLen*rLen*rLen/(2.f*h*h*h) + rLen*rLen/(h*h) + h/(2.f*rLen) - 1 ) / ( 2 * M_PI * pow( h, 3 ) ) ;
+	return 0;
 }
 
+inline float viscosityKernelLaplacian(glm::vec3 r, float h){
+	float rLen = glm::length(r);
+	if(rLen >= 0 || rLen <= h)
+		return 45.f * ( h - rLen ) / ( M_PI + pow(h, 6) ) ;
+	return 0.f;
+}
+
+///////////////////////////////computation//////////////////////////////////////
 glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	glm::vec3 f_pressure(0.f);
 	glm::vec3 f_viscosity(0.f);
@@ -207,24 +205,29 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	float invDensity;
 	glm::vec3 r;
 
+	float tension_coeff = 1.f;
+	glm::vec3 Cs_normal = glm::vec3(0.f);
+	float Cs_Laplacian = 0.f;
+
 	for (int i=0; i< ps.size(); i++){
 		invDensity = 1.f /ps[i].actual_density;
 		r = ps[index].pos - ps[i].pos;
 
-		 
+		
 		f_pressure -= ps[i].mass * ( ps[index].pressure + ps[i].pressure ) * 0.5f * invDensity * spikyKernelGradient(r, 1.0);
 		f_viscosity  += ps[i].mass * ( ps[index].vel - ps[i].vel) * invDensity * viscosityKernelLaplacian(r, 1.0);
 
+		Cs_normal += ps[i].mass * invDensity  * poly6KernelGradient(r, 1.0);
+		Cs_Laplacian += ps[i].mass * invDensity * poly6KernelLaplacian(r, 1.0);
+		
 	}
 
 	f_viscosity *= ps[index].viscosity_coef;
-	
-	
+	f_surfaceTension = - tension_coeff * Cs_Laplacian * glm::normalize(Cs_normal);
 
 	return f_pressure + f_viscosity + f_surfaceTension + f_gravitiy;
 
 }
-
 
 float particleSystem::computeDensity(const particleGrid& ps, int index){
 
@@ -252,7 +255,7 @@ void particleSystem::Draw(const VBO& vbos){
 			for(int j = 0; j < nSlice; j++){
 				index = i*nSlice+j;
 				m_positions[index] += (it->pos);
-				m_colors[index] = it->color_surface;
+				m_colors[index] = glm::vec3(0.f,0.f, 1.f);
 			}
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
