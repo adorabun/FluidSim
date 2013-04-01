@@ -1,22 +1,46 @@
-﻿Build started 3/28/2013 3:49:56 PM.
+﻿Build started 4/1/2013 2:37:24 PM.
      1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\fluidsim.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\fluidSim.cpp Source\main.cpp Source\particleSystem.cpp
-         fluidSim.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\particleSystem.cpp
+         particleSystem.cpp
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_integer.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-         Generating Code...
-         Skipping... (no relevant changes detected)
-         particleSystem.cpp
-         main.cpp
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(9): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(71): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(76): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(88): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(89): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(92): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(106): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(113): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(114): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(115): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(116): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(118): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(119): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(120): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(134): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(141): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(146): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(150): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(172): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(182): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(194): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(203): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(211): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(221): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(228): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(252): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(280): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(298): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(342): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Debug\fluidsim.exe" /INCREMENTAL /NOLOGO /LIBPATH:../glew/lib /LIBPATH:../glfw/lib glew32.lib glu32.lib opengl32.lib glfw.lib glfwdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\fluidsim.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Debug\fluidsim.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Debug\fluidsim.lib" /MACHINE:X86 Debug\fluidsim.exe.embed.manifest.res
-         Debug\fluidSim.obj
          Debug\main.obj
          Debug\particleSystem.obj
        Manifest:
@@ -32,4 +56,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.05
+Time Elapsed 00:00:01.20
