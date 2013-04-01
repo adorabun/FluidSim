@@ -15,17 +15,17 @@ particle::particle(){
 
 particle::particle(glm::vec3 position){
 		
-		mass = 1.f;
+		mass = 19.683f;
 		force = glm::vec3(0.f);
 
 		pos = position;
 		vel = glm::vec3(0.0);
 
-		rest_density = 100.f;
-		actual_density = 100.f;
+		rest_density = 1000.f;
+		actual_density = rest_density;
 
-		viscosity_coef = 1.f;
-		gas_constant = 20.f;
+		viscosity_coef = 10.f;
+		gas_constant = 3.f;
 		
 		temperature = 500;
 
@@ -71,9 +71,7 @@ void particleSystem::initParticles(int number){
 
 }
 
-/*neighbor search
-each cells has index of particles
-*/
+
 void particleSystem::initSphere(){
 
 	float phi   = 2.f * M_PI /(float)(nSlice-1);
@@ -117,6 +115,9 @@ void particleSystem::initSphere(){
 //how to handle boundary case?
 //how to speed up neighboring search?
 //make a particle grid
+/*neighbor search
+each cells has index of particles
+*/
 void particleSystem::LeapfrogIntegrate(float dt){
 	float halfdt = 0.5f * dt;
 	particleGrid target = particles;// target is a copy!
@@ -128,7 +129,6 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	//calculate actual density 
-	
 	for (int i=0; i < target.size(); i++){
 		target[i].actual_density = computeDensity(target, i);
 		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
@@ -200,7 +200,7 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen > 0 && rLen <= h){
-		float t = 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
+		float t = - 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
 		return t * r;
 	}
 	return glm::vec3(0.f);
@@ -257,11 +257,12 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 
 	f_viscosity *= ps[index].viscosity_coef;
 
+	
 	//float curvature =  - Cs_Laplacian / glm::length(Cs_normal);
 	//f_surfaceTension = tension_coeff * curvature * Cs_normal;
 
-	return f_pressure + /*f_viscosity + f_surfaceTesion + */f_gravity;
-	//return f_gravity;
+	//return f_pressure + f_viscosity + /*f_surfaceTesion + */f_gravity;
+	return f_pressure + f_viscosity + f_gravity;
 }
 
 float particleSystem::computeDensity(const particleGrid& ps, int index){
