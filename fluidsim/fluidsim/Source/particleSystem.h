@@ -21,23 +21,23 @@ public:
 	
 	glm::vec3 pos;
 	glm::vec3 vel;
-
 	glm::vec3 force;
 	 
 	float rest_density;
 	float actual_density;
 
-	float viscosity;
+	float viscosity_coef;
 
 	float gas_constant;
+
+	
+
+	float temperature;
 
 	glm::vec3 color_interface;
 	glm::vec3 color_surface;
 
-	float temperature;
-
-protected:
-
+	float pressure;
 };
 
 class particleSystem
@@ -56,10 +56,11 @@ private:
 	void initParticles(int number);
 	void initSphere();
 
-	void computeAllForces();
-	void computePressure();
-	void computeViscosity();
-	void computeSurfaceTension();
+	
+	glm::vec3 computeForce(const particleGrid& ps, int index);
+
+	//glm::vec3 computeColor(const particleGrid& ps, int index);
+	float computeDensity(const particleGrid& ps, int index);
 	
 private:
 	particleGrid particles;

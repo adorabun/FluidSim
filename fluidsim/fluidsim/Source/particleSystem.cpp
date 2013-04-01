@@ -1,40 +1,33 @@
 #include "particleSystem.h"
+#include <cmath>
 /////////////////////Particle///////////////////////////////////
 #define nSlice 6
 #define nStack 6
 #define radius 0.15f
 
 particle::particle(){
-		
-		mass = 1.f;
-		vel = glm::vec3(0.0);
-		
-		rest_density = 1.0;
-		actual_density = 1.0;
-		viscosity = 1;
-		gas_constant = 1;
-		temperature = 100;		
-		color_interface = glm::vec3(1,1,1);
-		color_surface =  glm::vec3(1,1,1);
+
 	}
 
 particle::particle(glm::vec3 position){
 		
 		mass = 1.f;
-		force = glm::vec3(0,-9.8f,0);
+		force = glm::vec3(0.f);
 
 		pos = position;
 		vel = glm::vec3(0.0);
 
 		rest_density = 1.0;
-		actual_density = 1.0;
-		viscosity = 1;
+		actual_density = 0.0;
+
+		viscosity_coef = 1;
 		gas_constant = 1;
+		
 		temperature = 100;
 		color_interface = glm::vec3(0,1,0);
 		color_surface =  glm::vec3(0.22,0.77,1);
 
-		
+
 	}
 
 particle::particle(const particle& p) 
@@ -46,12 +39,14 @@ particle::particle(const particle& p)
 	rest_density = p.rest_density;
 	actual_density = p.actual_density;
 
-	viscosity = p.viscosity;
+	viscosity_coef = p.viscosity_coef;
 	gas_constant = p.gas_constant;
 	temperature = p.temperature;
 
 	color_interface = p.color_interface;
 	color_surface = p.color_surface;
+
+	pressure = p.pressure;
 
 }
 
@@ -66,13 +61,14 @@ particle& particle::operator=(const particle& p)
 	rest_density = p.rest_density;
 	actual_density = p.actual_density;
 
-	viscosity = p.viscosity;
+	viscosity_coef = p.viscosity_coef;
 	gas_constant = p.gas_constant;
 	temperature = p.temperature;
 
 	color_interface = p.color_interface;
 	color_surface = p.color_surface;
 
+	pressure = p.pressure;
     return *this;
 }
 
@@ -152,13 +148,23 @@ void particleSystem::initSphere(){
 }
 
 void particleSystem::LeapfrogIntegrate(float dt){
-	float halfdt = 0.5 * dt;
+	float halfdt = 0.5f * dt;
 	particleGrid target = particles;// target is a copy!
+
 	for (int i=0; i < target.size(); i++){
 		target[i].pos = particles[i].pos + particles[i].vel * dt + halfdt * dt * particles[i].force / particles[i].mass;
 	}
 
-	//recalculate force
+	//calculate actual density 
+	
+	for (int i=0; i < target.size(); i++){
+		target[i].actual_density = computeDensity(target, i);
+		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
+	}
+
+	for (int i=0; i < target.size(); i++){
+		target[i].force = computeForce(target, i);
+	}
 
 	for (int i=0; i < target.size(); i++){
 		particles[i].vel += halfdt * (target[i].force  + particles[i].force) / particles[i].mass;
@@ -167,21 +173,77 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 }
 
-void particleSystem::computeAllForces(){
+
+
+inline float poly6Kernel(glm::vec3 r, float h){
+	float rLen = glm::length(r);
+
+	if(rLen >= 0 || rLen <= h)
+		return 315.f / (64 * M_PI * pow(h,9) ) * pow( h*h-rLen*rLen, 3);
+	return 0;
+}
+
+inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
+
+	float rLen = glm::length(r);
+	if(rLen >= 0 || rLen <= h){
+		float t = 45.f * (h-rLen) * (h-rLen) / (M_PI * pow(h, 6));
+		return t * glm::normalize(r);
+	}
+	return glm::vec3(0.f);
+}
+
+inline float viscosityKernelLaplacian(glm::vec3 r, float h){
+
+	return 45.f * ( h - glm::length(r) ) / ( M_PI + pow(h, 6) ) ;
+}
+
+glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
+	glm::vec3 f_pressure(0.f);
+	glm::vec3 f_viscosity(0.f);
+	glm::vec3 f_surfaceTension(0.f);
+	glm::vec3 f_gravitiy = glm::vec3(0,-9.8f,0);
+	
+	float invDensity;
+	glm::vec3 r;
+
+	for (int i=0; i< ps.size(); i++){
+		invDensity = 1.f /ps[i].actual_density;
+		r = ps[index].pos - ps[i].pos;
+
+		 
+		f_pressure -= ps[i].mass * ( ps[index].pressure + ps[i].pressure ) * 0.5f * invDensity * spikyKernelGradient(r, 1.0);
+		f_viscosity  += ps[i].mass * ( ps[index].vel - ps[i].vel) * invDensity * viscosityKernelLaplacian(r, 1.0);
+
+	}
+
+	f_viscosity *= ps[index].viscosity_coef;
+	
+	
+
+	return f_pressure + f_viscosity + f_surfaceTension + f_gravitiy;
 
 }
 
-void particleSystem::computePressure(){
-}
-void particleSystem::computeViscosity(){
-}
-void particleSystem::computeSurfaceTension(){
+
+float particleSystem::computeDensity(const particleGrid& ps, int index){
+
+	//resrt
+	float rho = 0.f;
+
+	//accumulate
+	for (int i=0; i< ps.size(); i++)
+		rho  += ps[i].mass * poly6Kernel(ps[index].pos - ps[i].pos, 1.0);
+	
+	return rho;
+		
 }
 
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
-	LeapfrogIntegrate(0.01);
+	LeapfrogIntegrate(0.01f);
+	
 	int index;
 
 	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it){
