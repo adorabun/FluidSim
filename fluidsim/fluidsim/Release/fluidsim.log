@@ -1,4 +1,4 @@
-﻿Build started 4/1/2013 4:14:50 PM.
+﻿Build started 4/1/2013 4:20:55 PM.
      1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (clean target(s)).
      1>_PrepareForClean:
          Deleting file "Release\fluidsim.lastbuildstate".
@@ -6,4 +6,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.01
+Time Elapsed 00:00:00.00

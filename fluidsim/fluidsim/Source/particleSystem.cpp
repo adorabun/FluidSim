@@ -258,11 +258,14 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	f_viscosity *= ps[index].viscosity_coef;
 
 	
-	//float curvature =  - Cs_Laplacian / glm::length(Cs_normal);
-	//f_surfaceTension = tension_coeff * curvature * Cs_normal;
+	float sCs_normal_len = glm::length(Cs_normal);
+	if(sCs_normal_len > 0.5f){
+		float curvature =  - Cs_Laplacian / sCs_normal_len;
+		f_surfaceTension = tension_coeff * curvature * Cs_normal;
+	}
 
-	//return f_pressure + f_viscosity + /*f_surfaceTesion + */f_gravity;
-	return f_pressure + f_viscosity + f_gravity;
+	return f_pressure + f_viscosity + f_surfaceTension + f_gravity;
+	
 }
 
 float particleSystem::computeDensity(const particleGrid& ps, int index){
