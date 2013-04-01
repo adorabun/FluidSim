@@ -308,7 +308,7 @@ int main(int argc, char** argv)
 
     VBO vbo_handle;
 
-	particleSystem ps(10);
+	particleSystem ps(5);
 	
 
     lastTime = glfwGetTime();

@@ -45,6 +45,9 @@ public:
 	void drawWireGrid();
 
 	typedef std::vector<particle> particleGrid;
+	static float nSlice;
+	static float nStack;
+	static float radius;
 
 private:
 	void initParticles(int number);
@@ -52,7 +55,6 @@ private:
 
 	
 	glm::vec3 computeForce(const particleGrid& ps, int index);
-
 	float computeDensity(const particleGrid& ps, int index);
 	
 private:

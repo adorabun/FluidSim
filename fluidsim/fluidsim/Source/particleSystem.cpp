@@ -1,9 +1,9 @@
 #include "particleSystem.h"
 #include <cmath>
 
-#define nSlice 6
-#define nStack 6
-#define radius 0.15f
+float particleSystem::nSlice = 6;
+float particleSystem::nStack = 6;
+float particleSystem::radius = 0.15;
 
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
@@ -64,6 +64,11 @@ void particleSystem::initParticles(int number){
 
 				particles[ x*number*number + y*number + z] = p;
 			}
+	
+	for (int i=0; i < particles.size(); i++){
+		particles[i].actual_density = computeDensity(particles, i);
+		particles[i].pressure = particles[i].gas_constant * (particles[i].actual_density - particles[i].rest_density);
+	}
 }
 
 void particleSystem::initSphere(){
@@ -105,13 +110,18 @@ void particleSystem::initSphere(){
 
 }
 
+
+//how to handle boundary case?
+//how to speed up neighboring search?
+//make a particle grid
 void particleSystem::LeapfrogIntegrate(float dt){
 	float halfdt = 0.5f * dt;
 	particleGrid target = particles;// target is a copy!
+	particleGrid& source = particles;//source is a ptr!
 
 	for (int i=0; i < target.size(); i++){
-		target[i].pos = particles[i].pos + particles[i].vel * dt 
-						+ halfdt * dt * particles[i].force / particles[i].actual_density;
+		target[i].pos = source[i].pos + source[i].vel * dt 
+						+ halfdt * dt * source[i].force / source[i].actual_density;
 	}
 
 	//calculate actual density 
@@ -126,8 +136,8 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	for (int i=0; i < target.size(); i++){
-		particles[i].vel += halfdt * (target[i].force/target[i].actual_density  + particles[i].force /particles[i].actual_density);
-		particles[i].pos = target[i].pos;
+		source[i].vel += halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
+		source[i].pos = target[i].pos;
 	}
 
 }
@@ -136,15 +146,15 @@ void particleSystem::LeapfrogIntegrate(float dt){
 inline float poly6Kernel(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
-	if(rLen >= 0 || rLen <= h)
+	if(rLen >= 0.f || rLen <= h)
 		return 315.f * pow(h*h-rLen*rLen, 3) / (64.f * M_PI * pow(h,9) ) ;
-	return 0;
+	return 0.f;
 }
 
 inline glm::vec3 poly6KernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
-	if(rLen >= 0 || rLen <= h){
+	if(rLen >= 0.f || rLen <= h){
 		float t =  945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
 		return t*r;
 	}
@@ -156,7 +166,7 @@ inline glm::vec3 poly6KernelGradient(glm::vec3 r, float h){
 inline float poly6KernelLaplacian(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
-	if(rLen >= 0 || rLen <= h)
+	if(rLen >= 0.f || rLen <= h)
 		return 945.f * (h*h - rLen*rLen) * (7.f*rLen*rLen - 3*h*h) / (32.f * M_PI * pow(h,9) );
 		
 	return 0.f;
@@ -165,15 +175,15 @@ inline float poly6KernelLaplacian(glm::vec3 r, float h){
 inline float spikyKernel(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
-	if(rLen >= 0 || rLen <= h)
+	if(rLen >= 0.f || rLen <= h)
 		return 15.f * pow(h - rLen, 3) / ( M_PI * pow(h,6) ) ;
-	return 0;
+	return 0.f;
 }
 
 inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 
 	float rLen = glm::length(r);
-	if(rLen >= 0 || rLen <= h){
+	if(rLen >= 0.f || rLen <= h){
 		float t = 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
 		return t * r;
 	}
@@ -183,14 +193,14 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 inline float viscosityKernel(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
-	if(rLen >= 0 || rLen <= h)
+	if(rLen >= 0.f || rLen <= h)
 		return 15.f * ( - rLen*rLen*rLen/(2.f*h*h*h) + rLen*rLen/(h*h) + h/(2.f*rLen) - 1 ) / ( 2 * M_PI * pow( h, 3 ) ) ;
-	return 0;
+	return 0.f;
 }
 
 inline float viscosityKernelLaplacian(glm::vec3 r, float h){
 	float rLen = glm::length(r);
-	if(rLen >= 0 || rLen <= h)
+	if(rLen >= 0.f || rLen <= h)
 		return 45.f * ( h - rLen ) / ( M_PI + pow(h, 6) ) ;
 	return 0.f;
 }
@@ -200,9 +210,9 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	glm::vec3 f_pressure(0.f);
 	glm::vec3 f_viscosity(0.f);
 	glm::vec3 f_surfaceTension(0.f);
-	glm::vec3 f_gravitiy = glm::vec3(0,-9.8f,0);
+	glm::vec3 f_gravity = glm::vec3(0,-9.8f,0);
 	
-	float invDensity;
+	float massTimesInvDensity;
 	glm::vec3 r;
 
 	float tension_coeff = 1.f;
@@ -210,23 +220,23 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	float Cs_Laplacian = 0.f;
 
 	for (int i=0; i< ps.size(); i++){
-		invDensity = 1.f /ps[i].actual_density;
+		massTimesInvDensity = ps[i].mass / ps[i].actual_density;
 		r = ps[index].pos - ps[i].pos;
 
 		
-		f_pressure -= ps[i].mass * ( ps[index].pressure + ps[i].pressure ) * 0.5f * invDensity * spikyKernelGradient(r, 1.0);
-		f_viscosity  += ps[i].mass * ( ps[index].vel - ps[i].vel) * invDensity * viscosityKernelLaplacian(r, 1.0);
+		f_pressure -=  massTimesInvDensity * ( ps[index].pressure + ps[i].pressure ) * 0.5f * spikyKernelGradient(r, 1.f);
+		f_viscosity  += massTimesInvDensity* ( ps[index].vel - ps[i].vel ) * viscosityKernelLaplacian(r, 1.f);
 
-		Cs_normal += ps[i].mass * invDensity  * poly6KernelGradient(r, 1.0);
-		Cs_Laplacian += ps[i].mass * invDensity * poly6KernelLaplacian(r, 1.0);
+		Cs_normal += massTimesInvDensity * poly6KernelGradient(r, 1.f);
+		Cs_Laplacian += massTimesInvDensity * poly6KernelLaplacian(r, 1.f);
 		
 	}
 
 	f_viscosity *= ps[index].viscosity_coef;
 	f_surfaceTension = - tension_coeff * Cs_Laplacian * glm::normalize(Cs_normal);
 
-	return f_pressure + f_viscosity + f_surfaceTension + f_gravitiy;
-
+	//return f_pressure + f_viscosity + f_surfaceTension + f_gravity;
+	return f_gravity;
 }
 
 float particleSystem::computeDensity(const particleGrid& ps, int index){
@@ -236,7 +246,7 @@ float particleSystem::computeDensity(const particleGrid& ps, int index){
 
 	//accumulate
 	for (int i=0; i< ps.size(); i++)
-		rho  += ps[i].mass * poly6Kernel(ps[index].pos - ps[i].pos, 1.0);
+		rho  += ps[i].mass * poly6Kernel(ps[index].pos - ps[i].pos, 1.f);
 	
 	return rho;
 		
