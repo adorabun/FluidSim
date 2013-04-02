@@ -1,9 +1,9 @@
-﻿Build started 4/1/2013 11:49:56 PM.
+﻿Build started 4/2/2013 12:25:33 AM.
      1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Touching "Debug\fluidsim.unsuccessfulbuild".
+         Creating "Debug\fluidsim.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\particleSystem.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\main.cpp Source\particleSystem.cpp
          particleSystem.cpp
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
      1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
@@ -21,28 +21,29 @@
      1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(113): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
      1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(114): warning C4244: '=' : conversion from 'float' to 'unsigned short', possible loss of data
      1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(131): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(139): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(149): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(158): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(210): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(143): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(156): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(166): warning C4018: '<' : signed/unsigned mismatch
      1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(220): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(232): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(241): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(250): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(260): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(267): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(291): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(324): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(344): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(388): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(451): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(456): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(460): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(472): warning C4018: '>' : signed/unsigned mismatch
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(480): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(481): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(482): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(488): warning C4244: 'return' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(230): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(242): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(251): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(260): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(270): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(277): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(301): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(334): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(354): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\particlesystem.cpp(398): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
+         main.cpp
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_integer.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\main.cpp(343): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\fluidsim\source\main.cpp(364): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
+         Generating Code...
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
@@ -62,4 +63,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.13
+Time Elapsed 00:00:01.88

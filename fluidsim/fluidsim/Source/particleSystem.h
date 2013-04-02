@@ -63,23 +63,23 @@ private:
 private:
 	particleGrid particles;
 
-	class Grid{
-	public:
-		void resize(int x, int y, int z, const particleGrid& ps);
-		void refillGrid(const particleGrid& ps);
+	//class Grid{
+	//public:
+	//	void resize(int x, int y, int z, const particleGrid& ps);
+	//	void refillGrid(const particleGrid& ps);
 
-		void pushParticle(const particle& p);
-		particleGrid getNeighbors(const particle& p);
-		
+	//	void pushParticle(const particle& p);
+	//	particleGrid getNeighbors(const particle& p);
+	//	
 
-		int positionToIndex(glm::vec3 p);
-		int gridToVec(glm::vec3 index);
-		
-		glm::vec3 dim;
-		std::vector<particleGrid> GridData;
-	};
+	//	int positionToIndex(glm::vec3 p);
+	//	int gridToVec(glm::vec3 index);
+	//	
+	//	glm::vec3 dim;
+	//	std::vector<particleGrid> GridData;
+	//};
 
-	Grid gridcells;
+	//Grid gridcells;
 
 	std::vector<glm::vec3> m_positions;
 	std::vector<glm::vec3> m_normals;

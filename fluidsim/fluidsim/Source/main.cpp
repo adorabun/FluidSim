@@ -25,7 +25,7 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 20.f;
+float eye_distance = 15.f;
 float head = 30.f, pitch = 45.f;
 glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 0.0f, 0.0f);
 
@@ -334,8 +334,8 @@ int main(int argc, char** argv)
         deactivate_shaderprog(m_shaderprog_handle);
 
         drawAxes();
-       // if(!pause && record)
-         //   grabScreen();
+        if(!pause && record)
+            grabScreen();
         frame_num++;
 
         now = glfwGetTime();
