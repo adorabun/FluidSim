@@ -49,9 +49,9 @@ particleSystem::particleSystem(int number){
 	xstart = 0.f;
 	ystart = 0.f;
 	zstart = 0.f;
-	xend = 4.f;
-	yend = 4.f;
-	zend = 4.f;
+	xend = 3.5f;
+	yend = 3.5f;
+	zend = 3.5f;
 
 	initParticles(number);
 	initSphere();
@@ -176,12 +176,11 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	
 	for (int i=0; i < target.size(); i++){
-		if( CollisionDectection2(target[i], collision_normal) ){
-			//glm::vec3 vn = (source[i].vel * collision_normal) * collision_normal;//decompose v along normal
-			//glm::vec3 vt = source[i].vel - vt;
-			//source[i].vel = 0.9f * vt - 0.5f * vn;//flip normal direction speed
-			//
-			source[i].vel.y *= -1.f;
+		if( CollisionDectection(target[i], collision_normal) ){
+			glm::vec3 vn = (source[i].vel * collision_normal) * collision_normal;//decompose v along normal
+			glm::vec3 vt = source[i].vel - vn;
+			source[i].vel = 0.9f * vt - 0.8f * vn;//flip normal direction speed
+			//source[i].vel.y *= -0.8f;
 		}else{
 			//what should i do if actual_density is 0?
 		/*	if(source[i].actual_density == 0.f && target[i].actual_density == 0.f)
