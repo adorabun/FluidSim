@@ -14,6 +14,7 @@ public:
 
 	particle(glm::vec3 position);
 
+	
 	float mass;
 	
 	glm::vec3 pos;
@@ -48,18 +49,37 @@ public:
 	static float nSlice;
 	static float nStack;
 	static float radius;
-
+	
 private:
 	void initParticles(int number);
 	void initSphere();
 
 	
-	glm::vec3 computeForce(const particleGrid& ps, int index);
-	float computeDensity(const particleGrid& ps, int index);
+	glm::vec3 computeForce(const particleGrid& ps, particle pi);
+	float computeDensity(const particleGrid& ps, particle pi);
 	bool checkIfOutOfBoundry(particle p);
+	bool CollisionDectection(particle p, glm::vec3& n);
 
 private:
 	particleGrid particles;
+
+	class Grid{
+	public:
+		void resize(int x, int y, int z, const particleGrid& ps);
+		void refillGrid(const particleGrid& ps);
+
+		void pushParticle(const particle& p);
+		particleGrid getNeighbors(const particle& p);
+		
+
+		int positionToIndex(glm::vec3 p);
+		int gridToVec(glm::vec3 index);
+		
+		glm::vec3 dim;
+		std::vector<particleGrid> GridData;
+	};
+
+	Grid gridcells;
 
 	std::vector<glm::vec3> m_positions;
 	std::vector<glm::vec3> m_normals;

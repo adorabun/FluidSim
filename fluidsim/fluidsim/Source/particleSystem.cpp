@@ -1,7 +1,7 @@
 #include "particleSystem.h"
 #include <cmath>
 
-#define EPSILON 0.00001f
+#define EPSILON 0.0001f
 #define SMOOTH_CORE_RADIUS 1.f
 
 float particleSystem::nSlice = 6;
@@ -31,6 +31,8 @@ particle::particle(glm::vec3 position){
 
 		color_interface = 1.f;
 		color_surface = 1.f;
+		
+	
 
 
 	}
@@ -42,12 +44,12 @@ particleSystem::particleSystem(){
 }
 
 particleSystem::particleSystem(int number){
-	xstart = -3.0;
-	ystart = -3.0;
-	zstart = -3.0;
-	xend = 9.0;
-	yend = 9.0;
-	zend = 9.0;
+	xstart = 0.f;
+	ystart = 0.f;
+	zstart = 0.f;
+	xend = 5.f;
+	yend = 5.f;
+	zend = 5.f;
 
 	initParticles(number);
 	initSphere();
@@ -57,7 +59,9 @@ void particleSystem::initParticles(int number){
 
 	float stepsize = 2.f * radius;
 
+	
 	particles.resize(number * number * number);
+	
 
 	for(int x = 0; x < number; x++)
 		for(int y = 0; y < number; y++)
@@ -65,9 +69,10 @@ void particleSystem::initParticles(int number){
 
 				particle p(glm::vec3(x, y, z) * stepsize + glm::vec3(radius));
 
-				particles[ x*number*number + y*number + z] = p;
+				particles[x*number*number + y*number + z] = p;
 			}
-	
+
+	gridcells.resize(5,5,5, particles);
 
 }
 
@@ -128,24 +133,40 @@ void particleSystem::LeapfrogIntegrate(float dt){
 						+ halfdt * dt * source[i].force / source[i].actual_density;
 	}
 
+	particleGrid nghrs;
+	glm::vec3 collision_normal = glm::vec3(0.f);
 	//calculate actual density 
 	for (int i=0; i < target.size(); i++){
-		target[i].actual_density = computeDensity(target, i);
+	
+		/*nghrs = gridcells.getNeighbors(target[i]);
+		target[i].actual_density = computeDensity(nghrs, target[i]);
+		*/
+		target[i].actual_density = computeDensity(target, target[i]);
 		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 	}
 
+	
 	for (int i=0; i < target.size(); i++){
-		target[i].force = computeForce(target, i);
+			/*nghrs = gridcells.getNeighbors(target[i]);
+			target[i].force = computeForce(nghrs, target[i]);
+			*/
+			target[i].force = computeForce(target, target[i]);
+		
 	}
 
+	
 	for (int i=0; i < target.size(); i++){
-		if( checkIfOutOfBoundry(source[i]) ){
-			source[i].vel = glm::vec3(0.f);
+		if( CollisionDectection(target[i], collision_normal) ){
+			glm::vec3 vn = source[i].vel * collision_normal * collision_normal;//decompose v along normal
+			glm::vec3 vt = source[i].vel - vt;
+			source[i].vel = 0.98f * vt - 0.98f * vn;//flip normal direction speed
 		}else{
 			source[i].vel += halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
 			source[i].pos = target[i].pos;
 		}
 	}
+
+	gridcells.refillGrid(source);
 
 }
 
@@ -154,6 +175,32 @@ bool particleSystem::checkIfOutOfBoundry(particle p){
 	if(pos.x < xstart || pos.x > xend || pos.y < ystart || pos.y > yend || pos.z < zstart || pos.z > zend)
 		return true;
 	return false;
+}
+
+bool particleSystem::CollisionDectection(particle p, glm::vec3& n){
+	n = glm::vec3(0.f);
+	glm::vec3 pos = p.pos;
+
+	if(pos.x < xstart + EPSILON)
+		n.x = 1.f;
+	else if(pos.x > xend - EPSILON)
+		n.x = -1.f;
+	
+	if(pos.y < ystart + EPSILON)
+		n.y = 1.f;
+	else if(pos.y > yend - EPSILON)
+		n.y = -1.f;
+
+	if(pos.z < zstart + EPSILON)
+		n.z = 1.f;
+	else if(pos.z > zend - EPSILON)
+		n.z = -1.f;
+
+	if(n == glm::vec3(0.f))
+		return false;
+
+	glm::normalize(n);
+	return true;
 }
 ///////////////////////////////smoothing kernels//////////////////////////////////////
 inline float poly6Kernel(glm::vec3 r, float h){
@@ -228,11 +275,11 @@ inline float viscosityKernelLaplacian(glm::vec3 r, float h){
 //integrate
 //scene interaction
 //visualization
-glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
+glm::vec3 particleSystem::computeForce(const particleGrid& ps, particle pi){
 	glm::vec3 f_pressure(0.f);
 	glm::vec3 f_viscosity(0.f);
 	glm::vec3 f_surfaceTension(0.f);
-	glm::vec3 f_gravity = glm::vec3(0,-9.8f,0) * ps[index].actual_density;
+	glm::vec3 f_gravity = glm::vec3(0,-9.8f,0) * pi.actual_density;
 	
 	float massTimesInvDensity;
 	glm::vec3 r;
@@ -241,25 +288,25 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	glm::vec3 Cs_normal = glm::vec3(0.f);
 	float Cs_Laplacian = 0.f;
 
-	for (int i=0; i< ps.size(); i++){
-		massTimesInvDensity = ps[i].mass / ps[i].actual_density;
+	for (int j=0; j< ps.size(); j++){
+		massTimesInvDensity = ps[j].mass / ps[j].actual_density;
 
-		r = ps[index].pos - ps[i].pos;
+		r = pi.pos - ps[j].pos;
 
 		
-		f_pressure -=  massTimesInvDensity * ( ps[index].pressure + ps[i].pressure ) * 0.5f * spikyKernelGradient(r, SMOOTH_CORE_RADIUS);
-		f_viscosity  += massTimesInvDensity * ( ps[i].vel - ps[index].vel ) * viscosityKernelLaplacian(r, SMOOTH_CORE_RADIUS);
+		f_pressure -=  massTimesInvDensity * ( pi.pressure + ps[j].pressure ) * 0.5f * spikyKernelGradient(r, SMOOTH_CORE_RADIUS);
+		f_viscosity  += massTimesInvDensity * ( ps[j].vel - pi.vel ) * viscosityKernelLaplacian(r, SMOOTH_CORE_RADIUS);
 
 		Cs_normal += massTimesInvDensity * poly6KernelGradient(r, SMOOTH_CORE_RADIUS);
 		Cs_Laplacian += massTimesInvDensity * poly6KernelLaplacian(r, SMOOTH_CORE_RADIUS);
 		
 	}
 
-	f_viscosity *= ps[index].viscosity_coef;
+	f_viscosity *= pi.viscosity_coef;
 
 	
 	float sCs_normal_len = glm::length(Cs_normal);
-	if(sCs_normal_len > 0.5f){
+	if(sCs_normal_len > 0.8f){
 		float curvature =  - Cs_Laplacian / sCs_normal_len;
 		f_surfaceTension = tension_coeff * curvature * Cs_normal;
 	}
@@ -268,17 +315,17 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, int index){
 	
 }
 
-float particleSystem::computeDensity(const particleGrid& ps, int index){
+float particleSystem::computeDensity(const particleGrid& ps, particle pi){
 
 	//resrt
 	float rho = 0.f;
 
 	//accumulate
-	for (int i=0; i< ps.size(); i++)
+	for (int j=0; j< ps.size(); j++)
 	{
-		rho  += ps[i].mass * poly6Kernel(ps[index].pos - ps[i].pos, SMOOTH_CORE_RADIUS);
+		rho  += ps[j].mass * poly6Kernel(pi.pos - ps[j].pos, SMOOTH_CORE_RADIUS);
 	}
-	
+
 	return rho;
 		
 }
@@ -397,3 +444,48 @@ void particleSystem::drawWireGrid()
 
    glEnd();
 }
+
+///////////////////////////////Grid//////////////////////////////////////
+void particleSystem::Grid::resize(int x, int y, int z, const particleGrid& ps){
+	dim = glm::vec3(x,y,z);
+	GridData.resize(dim.x * dim.y * dim.z);
+	refillGrid(ps);
+}
+
+void particleSystem::Grid::refillGrid(const particleGrid& ps){
+	for(int i=0; i < GridData.size(); i++){
+		GridData[i].clear();
+	}
+
+	for(int i=0; i < ps.size(); i++){
+		pushParticle(ps[i]);
+	}
+}
+
+void particleSystem::Grid::pushParticle(const particle& p){
+	particle np = p;
+	int index = positionToIndex(np.pos);
+	GridData[index].push_back(np);
+}
+particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particle& p){
+	int index = positionToIndex(p.pos);
+	if(index> GridData.size())
+		return GridData[0];
+	return GridData[index];
+}
+
+int particleSystem::Grid::positionToIndex(glm::vec3 p){
+	glm::vec3 index(0);
+
+	index.x = (int) (p.x/SMOOTH_CORE_RADIUS);
+	index.y = (int) (p.y/SMOOTH_CORE_RADIUS);
+	index.z = (int) (p.z/SMOOTH_CORE_RADIUS);
+
+	return gridToVec(index);
+}
+int particleSystem::Grid::gridToVec(glm::vec3 index){
+
+	return dim.x * dim.y * index.z + dim.x * index.y + index.x;
+
+}
+
