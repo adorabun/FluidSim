@@ -237,7 +237,7 @@ void aimCamera(void)
     glUniformMatrix4fv(m_uniform_location[1], 1, false, &projection[0][0]);
 }
 
-void grabScreen(void)
+void grabScreen(particleSystem ps)
 {
  /*   unsigned char* bitmapData = new unsigned char[3 * window_width * window_height];
 
@@ -336,7 +336,7 @@ int main(int argc, char** argv)
 
         drawAxes();
         if(!pause && record)
-            grabScreen();
+            grabScreen(ps);
         frame_num++;
 
         now = glfwGetTime();
