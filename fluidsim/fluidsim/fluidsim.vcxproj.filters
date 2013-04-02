@@ -40,5 +40,8 @@
     <None Include="Shader\frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="exportMel.txt">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

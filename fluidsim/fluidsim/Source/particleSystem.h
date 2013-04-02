@@ -49,7 +49,8 @@ public:
 	static float nSlice;
 	static float nStack;
 	static float radius;
-	
+	void outputCenter(int& i_frame, char* s_file);
+
 private:
 	void initParticles(int number);
 	void initSphere();
@@ -59,7 +60,7 @@ private:
 	float computeDensity(const particleGrid& ps, particle pi);
 	bool checkIfOutOfBoundry(particle p);
 	bool CollisionDectection(particle p, glm::vec3& n);
-
+	bool CollisionDectection2(particle p, glm::vec3& n);
 private:
 	particleGrid particles;
 

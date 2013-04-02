@@ -1,7 +1,9 @@
 #include "particleSystem.h"
 #include <cmath>
+#include <fstream>
+#include <iostream>
 
-#define EPSILON 0.0001f
+#define EPSILON 0.000001f
 #define SMOOTH_CORE_RADIUS 1.f
 
 float particleSystem::nSlice = 6;
@@ -47,9 +49,9 @@ particleSystem::particleSystem(int number){
 	xstart = 0.f;
 	ystart = 0.f;
 	zstart = 0.f;
-	xend = 5.f;
-	yend = 5.f;
-	zend = 5.f;
+	xend = 4.f;
+	yend = 4.f;
+	zend = 4.f;
 
 	initParticles(number);
 	initSphere();
@@ -120,21 +122,29 @@ void particleSystem::initSphere(){
 /*neighbor search
 each cells has index of particles
 */
+//do neighbor search
+//compute density 
+//compute force
+//integrate
+//scene interaction
+//visualization
 void particleSystem::LeapfrogIntegrate(float dt){
 	float halfdt = 0.5f * dt;
 	particleGrid target = particles;// target is a copy!
 	particleGrid& source = particles;//source is a ptr!
 
 	for (int i=0; i < target.size(); i++){
-	/*	if(source[i].actual_density <= 0.00001f){
-			int a=0;
-		}*/
 
+		//what should i do if actual_density is 0?
+		
+		/*if(source[i].actual_density == 0.f)
+			continue;*/
 		target[i].pos = source[i].pos + source[i].vel * dt 
 						+ halfdt * dt * source[i].force / source[i].actual_density;
+		
 	}
 
-	particleGrid nghrs;
+	//particleGrid nghrs;
 	glm::vec3 collision_normal = glm::vec3(0.f);
 	//calculate actual density 
 	for (int i=0; i < target.size(); i++){
@@ -145,6 +155,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		//	target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 		//}else{
 			target[i].actual_density = computeDensity(target, target[i]);
+		
 			target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 		//}
 	}
@@ -155,18 +166,31 @@ void particleSystem::LeapfrogIntegrate(float dt){
 			//	nghrs = gridcells.getNeighbors(target[i]);
 			//	target[i].force = computeForce(nghrs, target[i]);
 			//}else
-				target[i].force = computeForce(target, target[i]);
+
+		//what should i do if actual_density is 0?
+		/*if (target[i].actual_density == 0.f)
+			continue;
+		*/target[i].force = computeForce(target, target[i]);
 		
 	}
 
 	
 	for (int i=0; i < target.size(); i++){
-		if( CollisionDectection(target[i], collision_normal) ){
-			glm::vec3 vn = source[i].vel * collision_normal * collision_normal;//decompose v along normal
-			glm::vec3 vt = source[i].vel - vt;
-			source[i].vel = 0.9f * vt - 0.5f * vn;//flip normal direction speed
-			
+		if( CollisionDectection2(target[i], collision_normal) ){
+			//glm::vec3 vn = (source[i].vel * collision_normal) * collision_normal;//decompose v along normal
+			//glm::vec3 vt = source[i].vel - vt;
+			//source[i].vel = 0.9f * vt - 0.5f * vn;//flip normal direction speed
+			//
+			source[i].vel.y *= -1.f;
 		}else{
+			//what should i do if actual_density is 0?
+		/*	if(source[i].actual_density == 0.f && target[i].actual_density == 0.f)
+				continue;
+			else if(source[i].actual_density == 0.f)
+				source[i].vel += halfdt * target[i].force/target[i].actual_density;
+			else if (target[i].actual_density == 0.f)
+				source[i].vel += halfdt * source[i].force /source[i].actual_density;
+			else*/
 			source[i].vel += halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
 			source[i].pos = target[i].pos;
 			source[i].force = target[i].force;
@@ -203,6 +227,23 @@ bool particleSystem::CollisionDectection(particle p, glm::vec3& n){
 		n.z = 1.f;
 	else if(pos.z > zend - EPSILON)
 		n.z = -1.f;
+
+	if(n == glm::vec3(0.f))
+		return false;
+
+	glm::normalize(n);
+	return true;
+}
+
+bool particleSystem::CollisionDectection2(particle p, glm::vec3& n){
+	n = glm::vec3(0.f);
+	glm::vec3 pos = p.pos;
+
+	
+	if(pos.y <= ystart)
+		n.y = 1.f;
+	else if(pos.y >= yend)
+		n.y = -1.f;
 
 	if(n == glm::vec3(0.f))
 		return false;
@@ -277,12 +318,6 @@ inline float viscosityKernelLaplacian(glm::vec3 r, float h){
 }
 
 ///////////////////////////////computation//////////////////////////////////////
-//do neighbor search
-//compute density 
-//compute force
-//integrate
-//scene interaction
-//visualization
 glm::vec3 particleSystem::computeForce(const particleGrid& ps, particle pi){
 	glm::vec3 f_pressure(0.f);
 	glm::vec3 f_viscosity(0.f);
@@ -453,6 +488,28 @@ void particleSystem::drawWireGrid()
    glEnd();
 }
 
+void particleSystem::outputCenter(int& i_frame, char* s_file)
+{
+	std::ofstream io_out;
+	if(i_frame == 0)
+		io_out.open(s_file, std::ios::ate);
+	else
+		io_out.open(s_file, std::ios::app);
+	io_out<<i_frame<<" ";
+	glm::vec3 center = glm::vec3(0.0,0.0,0.0);
+	int n = 0;
+	std::cout<<particles.size();
+	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it)
+	{
+		center = it->pos;
+		io_out<<center.x<<" "<<center.y<<" "<<center.z<<" ";
+		n++;
+		if(n > 3)
+			break;
+	}
+	io_out<<std::endl;
+	i_frame++;
+}
 ///////////////////////////////Grid//////////////////////////////////////
 //void particleSystem::Grid::resize(int x, int y, int z, const particleGrid& ps){
 //	dim = glm::vec3(x,y,z);

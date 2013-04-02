@@ -253,6 +253,7 @@ void grabScreen(void)
     stbi_write_png(anim_filename, window_width, window_height, 3, bitmapData, window_width * 3);
 
     delete [] bitmapData;*/
+	ps.outputCenter(frame_num, "output/output.txt");
 }
 
 void activate_shaderprog(GLuint shaderprog)

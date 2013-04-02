@@ -20,6 +20,7 @@
     <ClInclude Include="Source\particleSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="exportMel.txt" />
     <None Include="Shader\frag.glsl" />
     <None Include="Shader\vert.glsl" />
   </ItemGroup>

@@ -1,0 +1,28 @@
+global proc port(int $i_frame_max, int $i_vrt_max, string $s_file)
+{
+    $io_file = `fopen $s_file "r"`;
+    
+    int $i, $j;
+    string $name;
+    for($j = 1; $j <= $i_vrt_max; ++$j)
+    {
+        polySphere -radius 0.1;
+    }
+    for($i = 0;  $i < $i_frame_max; ++$i)
+    {
+        string $s = `fgetword $io_file`;
+        int $ss = $s;
+        currentTime -edit $ss;
+        for($j = 1; $j <= $i_vrt_max; ++$j)
+        {
+            $name = "pSphere" + $j;
+            select $name;
+            move ((float)`fgetword $io_file`) ((float)`fgetword $io_file`) ((float)`fgetword $io_file`);
+            setKeyframe;
+        }
+    }
+    fclose $io_file;
+}
+
+string $filePath = "E:/output.txt";  
+port(74,4,$filePath);//frame vertices 
