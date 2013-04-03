@@ -51,7 +51,12 @@ public:
 	static float radius;
 	static float tension_coeff;//sigma
 	static float surfaceThreshold;//l
-	
+	static float xstart;
+	static float ystart;
+	static float zstart;
+	static float xend;
+	static float yend;
+	static float zend;
 
 	void outputCenter(int& i_frame, char* s_file);
 
@@ -74,7 +79,7 @@ private:
 		void refillGrid(const particleGrid& ps);
 
 		void pushParticle(const particle& p);
-		particleGrid getNeighbors(const particleGrid& ps, const particle& p);
+		void getNeighbors(const particleGrid& ps, const particle& p, particleGrid& des);
 		
 
 		glm::vec3 positionToGridIndex(glm::vec3 p);
@@ -94,12 +99,7 @@ private:
 	std::vector<glm::vec3> m_colors;
 	std::vector<unsigned short> m_indices;
 
-	double xstart;
-	double ystart;
-	double zstart;
-	double xend;
-	double yend;
-	double zend;
+	
 };
 
 #endif

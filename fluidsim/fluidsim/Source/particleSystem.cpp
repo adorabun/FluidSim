@@ -5,6 +5,7 @@
 
 #define EPSILON 0.000001f
 #define SMOOTH_CORE_RADIUS 1.f //three times the average distance
+#define offset glm::vec3(2.5f, 4.f, 2.5f)
 
 float particleSystem::nSlice = 6;
 float particleSystem::nStack = 6;
@@ -12,6 +13,13 @@ float particleSystem::radius = 0.15;
 float particleSystem::tension_coeff = 50.f;//sigma
 float particleSystem::surfaceThreshold = 0.5f;//l
 
+float particleSystem::xstart = 0.f;
+float particleSystem::ystart = 0.f;
+float particleSystem::zstart = 0.f;
+float particleSystem::xend = 10.0f;
+float particleSystem::yend = 10.0f;
+float particleSystem::zend = 10.0f;
+#define gridDim glm::vec3(10,10,10)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -19,7 +27,7 @@ particle::particle(){
 
 particle::particle(glm::vec3 position){
 		
-		mass = 19.683f;
+		mass = 185.193f;//74.088;//19.683f;
 		force = glm::vec3(0.f);
 
 		pos = position;
@@ -48,17 +56,11 @@ particleSystem::particleSystem(){
 }
 
 particleSystem::particleSystem(int number){
-	xstart = 0.f;
-	ystart = 0.f;
-	zstart = 0.f;
-	xend = 4.0f;
-	yend = 6.0f;
-	zend = 4.0f;
 
 	initParticles(number);
 	initSphere();
 	
-	gridcells.resize(4,6,4, particles);
+	gridcells.resize(gridDim.x,gridDim.y,gridDim.z, particles);
 }
 
 void particleSystem::initParticles(int number){
@@ -72,7 +74,7 @@ void particleSystem::initParticles(int number){
 		for(int y = 0; y < number; y++)
 			for(int z = 0; z < number; z++){
 				id = x*number*number + y*number + z;
-				particle p(glm::vec3(x, y, z) * stepsize + glm::vec3(0.65f, 2.f, 0.65f));
+				particle p(glm::vec3(x, y, z) * stepsize + offset);
 				p.id = id;
 				particles[id] = p;
 			}
@@ -148,7 +150,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	particleGrid nghrs;
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
-			nghrs = gridcells.getNeighbors(target, target[i]);
+			gridcells.getNeighbors(target, target[i], nghrs);
 			
 			target[i].actual_density = computeDensity(nghrs, target[i]);
 			assert(target[i].actual_density>0);
@@ -161,7 +163,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
-			nghrs = gridcells.getNeighbors(target, target[i]);
+			gridcells.getNeighbors(target, target[i], nghrs);
 			target[i].force = computeForce(nghrs, target[i]);
 		}
 		
@@ -517,11 +519,11 @@ void particleSystem::Grid::pushParticle(const particle& p){
 		return;
 	GridData[index].push_back(np.id);
 }
-particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particleGrid& ps, const particle& p){
+void particleSystem::Grid::getNeighbors(const particleGrid& ps, const particle& p, particleGrid& des){
 	
 
-	particleGrid pg;
-	pg.reserve(1024);
+	des.clear();
+	des.reserve(2048);
 	std::vector<int> pgTemp;
 	glm::vec3 gridIndex = positionToGridIndex(p.pos);
 	glm::vec3 currGridIndex;
@@ -540,11 +542,11 @@ particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particleGr
 					for(int i=0; i < pgTemp.size(); i++)
 						pg[pgSize+i] = ps[pgTemp[i]];*/
 					for(int i=0; i < pgTemp.size(); i++)
-						pg.push_back(ps[pgTemp[i]]);
+						des.push_back(ps[pgTemp[i]]);
 				}
 			}
-	assert(pg.size()>0);
-	return pg;
+	assert(des.size()>0);
+
 }
 
 glm::vec3 particleSystem::Grid::positionToGridIndex(glm::vec3 p){
