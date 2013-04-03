@@ -497,7 +497,7 @@ void particleSystem::Grid::resize(int x, int y, int z, const particleGrid& ps){
 void particleSystem::Grid::refillGrid(const particleGrid& ps){
 	for(int i=0; i < GridData.size(); i++){
 		GridData[i].clear();
-		GridData[i].reserve(64);
+		GridData[i].reserve(256);
 	}
 
 	for(int i=0; i < ps.size(); i++){
@@ -521,11 +521,13 @@ particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particleGr
 	
 
 	particleGrid pg;
+	pg.reserve(1024);
 	std::vector<int> pgTemp;
 	glm::vec3 gridIndex = positionToGridIndex(p.pos);
 	glm::vec3 currGridIndex;
 	int vecIndex;
 	int pgSize;
+
 	for(int x=-1; x<=1; x++)
 		for(int y=-1; y<=1; y++)
 			for(int z=-1; z<=1; z++){
@@ -533,10 +535,12 @@ particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particleGr
 				if(IfWithinBoundry(currGridIndex)){
 					vecIndex = gridIndexToVecIndex(currGridIndex);
 					pgTemp = GridData[vecIndex];
-					pgSize = pg.size();
+					/*pgSize = pg.size();
 					pg.resize(pgTemp.size()+pgSize);
 					for(int i=0; i < pgTemp.size(); i++)
-						pg[pgSize+i] = ps[pgTemp[i]];
+						pg[pgSize+i] = ps[pgTemp[i]];*/
+					for(int i=0; i < pgTemp.size(); i++)
+						pg.push_back(ps[pgTemp[i]]);
 				}
 			}
 	assert(pg.size()>0);
