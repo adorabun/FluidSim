@@ -13,11 +13,15 @@
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\particleSystem.cpp" />
+    <ClCompile Include="Source\stb_image.c" />
+    <ClCompile Include="Source\stb_image_write.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\math_headers.h" />
     <ClInclude Include="Source\openGL_headers.h" />
     <ClInclude Include="Source\particleSystem.h" />
+    <ClInclude Include="Source\stb_image.h" />
+    <ClInclude Include="Source\stb_image_write.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exportMel.txt" />

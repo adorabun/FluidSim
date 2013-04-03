@@ -2,6 +2,7 @@
 #include "openGL_headers.h"
 #include "math_headers.h"
 #include "particleSystem.h"
+#include "stb_image_write.h"
 
 int window_width = 1024;
 int window_height = 768;
@@ -237,9 +238,9 @@ void aimCamera(void)
     glUniformMatrix4fv(m_uniform_location[1], 1, false, &projection[0][0]);
 }
 
-void grabScreen(particleSystem ps)
+void grabScreen(const particleSystem& ps)
 {
- /*   unsigned char* bitmapData = new unsigned char[3 * window_width * window_height];
+    unsigned char* bitmapData = new unsigned char[3 * window_width * window_height];
 
     for (int i=0; i < window_height; i++) 
     {
@@ -248,12 +249,12 @@ void grabScreen(particleSystem ps)
     }
 
     char anim_filename[2048];
-    sprintf_s(anim_filename, 2048, "output/PBD_no_self_intersect_%04d.png", frame_num);
+    sprintf_s(anim_filename, 2048, "output/sph.png", frame_num);
 
     stbi_write_png(anim_filename, window_width, window_height, 3, bitmapData, window_width * 3);
 
-    delete [] bitmapData;*/
-	ps.outputCenter(frame_num, "output/output.txt");
+    delete [] bitmapData;
+	//ps.outputCenter(frame_num, "output/output.txt");
 }
 
 void activate_shaderprog(GLuint shaderprog)

@@ -536,10 +536,6 @@ void particleSystem::Grid::getNeighbors(const particleGrid& ps, const particle& 
 				if(IfWithinBoundry(currGridIndex)){
 					vecIndex = gridIndexToVecIndex(currGridIndex);
 					pgTemp = GridData[vecIndex];
-					/*pgSize = pg.size();
-					pg.resize(pgTemp.size()+pgSize);
-					for(int i=0; i < pgTemp.size(); i++)
-						pg[pgSize+i] = ps[pgTemp[i]];*/
 					for(int i=0; i < pgTemp.size(); i++)
 						des.push_back(ps[pgTemp[i]]);
 				}
