@@ -37,16 +37,13 @@ particle::particle(glm::vec3 position){
 		rest_density = 1000.f;
 		actual_density = rest_density;
 
-		viscosity_coef = 10.f;//10.f
-		gas_constant = 3.f;
+		viscosity_coef = 100.f;//10.f
+		gas_constant = 10.f;//3.f
 		
 		temperature = 500;
 
 		color_interface = 1.f;
 		color_surface = 1.f;
-		
-	
-
 
 	}
 
@@ -185,7 +182,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		if( CollisionDectection(target[i], collision_normal) ){
 			glm::vec3 vn = (source[i].vel * collision_normal) * collision_normal;//decompose v along normal
 			glm::vec3 vt = source[i].vel - vn;
-			source[i].vel = 0.9f * vt - 0.8f * vn;//flip normal direction speed
+			source[i].vel = 0.9f * vt - 0.5f * vn;//flip normal direction speed
 		}else{
 			source[i].vel += halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
 			source[i].pos = target[i].pos;

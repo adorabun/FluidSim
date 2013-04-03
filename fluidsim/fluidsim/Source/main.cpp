@@ -26,7 +26,7 @@ GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
 float eye_distance = 35.f;
-float head = 25.f, pitch = 45.f;
+float head = 25.f, pitch = 55.f;
 glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 0.0f, 0.0f);
 
 //----------functions----------//
