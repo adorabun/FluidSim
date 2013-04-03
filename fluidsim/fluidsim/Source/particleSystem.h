@@ -49,6 +49,10 @@ public:
 	static float nSlice;
 	static float nStack;
 	static float radius;
+	static float tension_coeff;//sigma
+	static float surfaceThreshold;//l
+	
+
 	void outputCenter(int& i_frame, char* s_file);
 
 private:
@@ -60,27 +64,29 @@ private:
 	float computeDensity(const particleGrid& ps, particle pi);
 	bool checkIfOutOfBoundry(particle p);
 	bool CollisionDectection(particle p, glm::vec3& n);
-	bool CollisionDectection2(particle p, glm::vec3& n);
+
 private:
 	particleGrid particles;
 
-	//class Grid{
-	//public:
-	//	void resize(int x, int y, int z, const particleGrid& ps);
-	//	void refillGrid(const particleGrid& ps);
+	class Grid{
+	public:
+		void resize(int x, int y, int z, const particleGrid& ps);
+		void refillGrid(const particleGrid& ps);
 
-	//	void pushParticle(const particle& p);
-	//	particleGrid getNeighbors(const particle& p);
-	//	
+		void pushParticle(const particle& p);
+		particleGrid getNeighbors(const particle& p);
+		
 
-	//	int positionToIndex(glm::vec3 p);
-	//	int gridToVec(glm::vec3 index);
-	//	
-	//	glm::vec3 dim;
-	//	std::vector<particleGrid> GridData;
-	//};
+		glm::vec3 positionToGridIndex(glm::vec3 p);
+		int gridIndexToVecIndex(glm::vec3 index);
+		int positionToVecIndex(glm::vec3 p);
+		bool IfWithinBoundry(glm::vec3 gridIndex);
+		
+		glm::vec3 dim;
+		std::vector<particleGrid> GridData;
+	};
 
-	//Grid gridcells;
+	Grid gridcells;
 
 	std::vector<glm::vec3> m_positions;
 	std::vector<glm::vec3> m_normals;
