@@ -11,15 +11,16 @@ float particleSystem::nSlice = 6;
 float particleSystem::nStack = 6;
 float particleSystem::radius = 0.15;
 float particleSystem::tension_coeff = 50.f;//sigma
-float particleSystem::surfaceThreshold = 0.5f;//l
+float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
+
 float particleSystem::ystart = 0.f;
 float particleSystem::zstart = 0.f;
 float particleSystem::xend = 11.0f;
 float particleSystem::yend = 12.0f;
 float particleSystem::zend = 11.0f;
-#define gridDim glm::vec3(11,12,11)
+
 #define offset glm::vec3(3.5f, 4.f, 3.5f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
@@ -28,7 +29,7 @@ particle::particle(){
 
 particle::particle(glm::vec3 position){
 		
-		mass = 91.125f;//=((width-1)*radius*2)^3
+		mass = 27.f;//91.125f;19.683f;=((width-1)*radius*2)^3 * density/particle num
 		force = glm::vec3(0.f);
 
 		pos = position;
@@ -38,7 +39,7 @@ particle::particle(glm::vec3 position){
 		actual_density = rest_density;
 
 		viscosity_coef = 100.f;//10.f
-		gas_constant = 10.f;//3.f
+		gas_constant = 30.f;//3.f
 		
 		temperature = 500;
 
@@ -58,7 +59,11 @@ particleSystem::particleSystem(int number){
 	initParticles(number);
 	initSphere();
 	
-	gridcells.resize(gridDim.x,gridDim.y,gridDim.z, particles);
+	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
+	int gy = floor(yend/SMOOTH_CORE_RADIUS) + 1;
+	int gz = floor(zend/SMOOTH_CORE_RADIUS) + 1;
+
+	gridcells.resize(gx, gy, gz, particles);
 }
 
 void particleSystem::initParticles(int number){
@@ -273,7 +278,7 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen > 0 && rLen <= h){
-		float t = - 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
+		float t = -45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
 		return t * r;
 	}
 	return glm::vec3(0.f);
@@ -332,7 +337,7 @@ void particleSystem::computeForce(const particleGrid& ps, particle& pi){
 	}
 	
 	pi.force = f_pressure + f_viscosity + f_surfaceTension + f_gravity;
-	//pi.force = f_gravity;
+	//pi.force = f_pressure +  f_gravity;
 }
 
 void particleSystem::computeDensity(const particleGrid& ps, particle& pi){
