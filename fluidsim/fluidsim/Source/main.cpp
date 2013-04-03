@@ -274,6 +274,14 @@ void deactivate_shaderprog(GLuint shaderprog)
 
 int main(int argc, char** argv)
 {
+	{
+		unsigned int cw;
+		// Note : same result with controlfp
+		cw = _control87(0,0) & MCW_EM;
+		cw &= ~(_EM_INVALID|_EM_ZERODIVIDE|_EM_OVERFLOW);
+		_control87(cw,MCW_EM);
+	}//enable float point exception
+
     bool run = GL_TRUE;
 
     if(!glfwInit())

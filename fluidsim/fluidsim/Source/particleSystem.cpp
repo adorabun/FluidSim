@@ -57,6 +57,7 @@ particleSystem::particleSystem(int number){
 
 	initParticles(number);
 	initSphere();
+	
 	gridcells.resize(4,6,4, particles);
 }
 
@@ -66,14 +67,14 @@ void particleSystem::initParticles(int number){
 
 	
 	particles.resize(number * number * number);
-	
+	int id;
 	for(int x = 0; x < number; x++)
 		for(int y = 0; y < number; y++)
 			for(int z = 0; z < number; z++){
-
+				id = x*number*number + y*number + z;
 				particle p(glm::vec3(x, y, z) * stepsize + glm::vec3(0.65f, 2.f, 0.65f));
-
-				particles[x*number*number + y*number + z] = p;
+				p.id = id;
+				particles[id] = p;
 			}
 }
 
@@ -142,34 +143,39 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	//calculate actual density 
+	gridcells.refillGrid(target);
 
-	/*particleGrid nghrs;
+	particleGrid nghrs;
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
 			nghrs = gridcells.getNeighbors(target[i]);
+			
 			target[i].actual_density = computeDensity(nghrs, target[i]);
+			assert(target[i].actual_density>0);
+
 			target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 		}
 	}
 
 	
+
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
 			nghrs = gridcells.getNeighbors(target[i]);
 			target[i].force = computeForce(nghrs, target[i]);
 		}
 		
-	}*/
+	}
 
 	//calculate actual density 
-	for (int i=0; i < target.size(); i++){
+	/*for (int i=0; i < target.size(); i++){
 		target[i].actual_density = computeDensity(target, target[i]);
 		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 	}
 
 	for (int i=0; i < target.size(); i++){
 		target[i].force = computeForce(target, target[i]);
-	}
+	}*/
 
 	glm::vec3 collision_normal = glm::vec3(0.f);
 	for (int i=0; i < target.size(); i++){
@@ -185,7 +191,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		}
 	}
 
-	//gridcells.refillGrid(source);
+	
 
 }
 
@@ -276,7 +282,7 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 inline float viscosityKernel(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
-	if(rLen <= h)
+	if(rLen>0 && rLen <= h)
 		return 15.f * ( - rLen*rLen*rLen/(2.f*h*h*h) + rLen*rLen/(h*h) + h/(2.f*rLen) - 1 ) / ( 2 * M_PI * pow( h, 3 ) ) ;
 	return 0.f;
 }
@@ -502,12 +508,17 @@ void particleSystem::Grid::refillGrid(const particleGrid& ps){
 void particleSystem::Grid::pushParticle(const particle& p){
 	particle np = p;
 	int index = positionToVecIndex(np.pos);
+	/*if(p.id == 122){
+		std::cout<<p.pos.x<<","<<p.pos.y<<","<<p.pos.z<<"--->";
+		std::cout<<index<<std::endl;
+	}*/
 	if(index == -1)
 		return;
 	GridData[index].push_back(np);
 }
 particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particle& p){
 	
+
 	particleGrid pg, pgTemp;
 	glm::vec3 gridIndex = positionToGridIndex(p.pos);
 	glm::vec3 currGridIndex;
@@ -526,6 +537,7 @@ particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particle& 
 						pg[pgSize+i] = pgTemp[i];
 				}
 			}
+	assert(pg.size()>0);
 	return pg;
 }
 

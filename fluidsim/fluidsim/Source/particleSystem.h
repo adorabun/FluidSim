@@ -14,7 +14,7 @@ public:
 
 	particle(glm::vec3 position);
 
-	
+	int id;
 	float mass;
 	
 	glm::vec3 pos;
