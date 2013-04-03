@@ -5,7 +5,7 @@
 
 #define EPSILON 0.000001f
 #define SMOOTH_CORE_RADIUS 1.f //three times the average distance
-#define offset glm::vec3(2.5f, 4.f, 2.5f)
+
 
 float particleSystem::nSlice = 6;
 float particleSystem::nStack = 6;
@@ -16,10 +16,11 @@ float particleSystem::surfaceThreshold = 0.5f;//l
 float particleSystem::xstart = 0.f;
 float particleSystem::ystart = 0.f;
 float particleSystem::zstart = 0.f;
-float particleSystem::xend = 10.0f;
-float particleSystem::yend = 10.0f;
-float particleSystem::zend = 10.0f;
-#define gridDim glm::vec3(10,10,10)
+float particleSystem::xend = 11.0f;
+float particleSystem::yend = 12.0f;
+float particleSystem::zend = 11.0f;
+#define gridDim glm::vec3(11,12,11)
+#define offset glm::vec3(3.5f, 4.f, 3.5f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -27,7 +28,7 @@ particle::particle(){
 
 particle::particle(glm::vec3 position){
 		
-		mass = 185.193f;//74.088;//19.683f;
+		mass = 91.125f;//=((width-1)*radius*2)^3
 		force = glm::vec3(0.f);
 
 		pos = position;
@@ -152,7 +153,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		if( !checkIfOutOfBoundry(target[i]) ){
 			gridcells.getNeighbors(target, target[i], nghrs);
 			
-			target[i].actual_density = computeDensity(nghrs, target[i]);
+			computeDensity(nghrs, target[i]);
 			assert(target[i].actual_density>0);
 
 			target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
@@ -164,7 +165,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
 			gridcells.getNeighbors(target, target[i], nghrs);
-			target[i].force = computeForce(nghrs, target[i]);
+			computeForce(nghrs, target[i]);
 		}
 		
 	}
@@ -197,14 +198,14 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 }
 
-bool particleSystem::checkIfOutOfBoundry(particle p){
+bool particleSystem::checkIfOutOfBoundry(const particle& p){
 	glm::vec3 pos = p.pos;
 	if(pos.x < xstart || pos.x > xend || pos.y < ystart || pos.y > yend || pos.z < zstart || pos.z > zend)
 		return true;
 	return false;
 }
 
-bool particleSystem::CollisionDectection(particle p, glm::vec3& n){
+bool particleSystem::CollisionDectection(const particle& p, glm::vec3& n){
 	n = glm::vec3(0.f);
 	glm::vec3 pos = p.pos;
 
@@ -297,7 +298,7 @@ inline float viscosityKernelLaplacian(glm::vec3 r, float h){
 }
 
 ///////////////////////////////computation//////////////////////////////////////
-glm::vec3 particleSystem::computeForce(const particleGrid& ps, particle pi){
+void particleSystem::computeForce(const particleGrid& ps, particle& pi){
 	glm::vec3 f_pressure(0.f);
 	glm::vec3 f_viscosity(0.f);
 	glm::vec3 f_surfaceTension(0.f);
@@ -333,11 +334,11 @@ glm::vec3 particleSystem::computeForce(const particleGrid& ps, particle pi){
 		f_surfaceTension = tension_coeff * curvature * Cs_normal;
 	}
 	
-	return f_pressure + f_viscosity + f_surfaceTension + f_gravity;
-	//return f_gravity;
+	pi.force = f_pressure + f_viscosity + f_surfaceTension + f_gravity;
+	//pi.force = f_gravity;
 }
 
-float particleSystem::computeDensity(const particleGrid& ps, particle pi){
+void particleSystem::computeDensity(const particleGrid& ps, particle& pi){
 
 	//resrt
 	float rho = 0.f;
@@ -348,7 +349,8 @@ float particleSystem::computeDensity(const particleGrid& ps, particle pi){
 		rho  += ps[j].mass * poly6Kernel(pi.pos - ps[j].pos, SMOOTH_CORE_RADIUS);
 	}
 
-	return rho;
+	pi.actual_density = rho;
+
 		
 }
 
@@ -499,7 +501,7 @@ void particleSystem::Grid::resize(int x, int y, int z, const particleGrid& ps){
 void particleSystem::Grid::refillGrid(const particleGrid& ps){
 	for(int i=0; i < GridData.size(); i++){
 		GridData[i].clear();
-		GridData[i].reserve(256);
+		GridData[i].reserve(128);
 	}
 
 	for(int i=0; i < ps.size(); i++){
@@ -523,7 +525,7 @@ void particleSystem::Grid::getNeighbors(const particleGrid& ps, const particle& 
 	
 
 	des.clear();
-	des.reserve(2048);
+	des.reserve(1028);
 	std::vector<int> pgTemp;
 	glm::vec3 gridIndex = positionToGridIndex(p.pos);
 	glm::vec3 currGridIndex;

@@ -65,10 +65,10 @@ private:
 	void initSphere();
 
 	
-	glm::vec3 computeForce(const particleGrid& ps, particle pi);
-	float computeDensity(const particleGrid& ps, particle pi);
-	bool checkIfOutOfBoundry(particle p);
-	bool CollisionDectection(particle p, glm::vec3& n);
+	void computeForce(const particleGrid& ps, particle& pi);
+	void computeDensity(const particleGrid& ps, particle& pi);
+	bool checkIfOutOfBoundry(const particle& p);
+	bool CollisionDectection(const particle& p, glm::vec3& n);
 
 private:
 	particleGrid particles;
@@ -88,7 +88,7 @@ private:
 		bool IfWithinBoundry(glm::vec3 gridIndex);
 		
 		glm::vec3 dim;
-		//std::vector<particleGrid> GridData;
+
 		std::vector<std::vector<int>> GridData;
 	};
 
