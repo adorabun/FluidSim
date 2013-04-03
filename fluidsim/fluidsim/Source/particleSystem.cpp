@@ -148,7 +148,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	particleGrid nghrs;
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
-			nghrs = gridcells.getNeighbors(target[i]);
+			nghrs = gridcells.getNeighbors(target, target[i]);
 			
 			target[i].actual_density = computeDensity(nghrs, target[i]);
 			assert(target[i].actual_density>0);
@@ -161,7 +161,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	for (int i=0; i < target.size(); i++){
 		if( !checkIfOutOfBoundry(target[i]) ){
-			nghrs = gridcells.getNeighbors(target[i]);
+			nghrs = gridcells.getNeighbors(target, target[i]);
 			target[i].force = computeForce(nghrs, target[i]);
 		}
 		
@@ -497,6 +497,7 @@ void particleSystem::Grid::resize(int x, int y, int z, const particleGrid& ps){
 void particleSystem::Grid::refillGrid(const particleGrid& ps){
 	for(int i=0; i < GridData.size(); i++){
 		GridData[i].clear();
+		GridData[i].reserve(64);
 	}
 
 	for(int i=0; i < ps.size(); i++){
@@ -514,12 +515,13 @@ void particleSystem::Grid::pushParticle(const particle& p){
 	}*/
 	if(index == -1)
 		return;
-	GridData[index].push_back(np);
+	GridData[index].push_back(np.id);
 }
-particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particle& p){
+particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particleGrid& ps, const particle& p){
 	
 
-	particleGrid pg, pgTemp;
+	particleGrid pg;
+	std::vector<int> pgTemp;
 	glm::vec3 gridIndex = positionToGridIndex(p.pos);
 	glm::vec3 currGridIndex;
 	int vecIndex;
@@ -534,7 +536,7 @@ particleSystem::particleGrid particleSystem::Grid::getNeighbors(const particle& 
 					pgSize = pg.size();
 					pg.resize(pgTemp.size()+pgSize);
 					for(int i=0; i < pgTemp.size(); i++)
-						pg[pgSize+i] = pgTemp[i];
+						pg[pgSize+i] = ps[pgTemp[i]];
 				}
 			}
 	assert(pg.size()>0);

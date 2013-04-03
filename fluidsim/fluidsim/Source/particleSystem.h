@@ -74,7 +74,7 @@ private:
 		void refillGrid(const particleGrid& ps);
 
 		void pushParticle(const particle& p);
-		particleGrid getNeighbors(const particle& p);
+		particleGrid getNeighbors(const particleGrid& ps, const particle& p);
 		
 
 		glm::vec3 positionToGridIndex(glm::vec3 p);
@@ -83,7 +83,8 @@ private:
 		bool IfWithinBoundry(glm::vec3 gridIndex);
 		
 		glm::vec3 dim;
-		std::vector<particleGrid> GridData;
+		//std::vector<particleGrid> GridData;
+		std::vector<std::vector<int>> GridData;
 	};
 
 	Grid gridcells;
