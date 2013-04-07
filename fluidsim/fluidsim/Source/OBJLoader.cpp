@@ -31,19 +31,19 @@ int OBJLoader::readOBJ(const char* file)
 		iss>>type;
 		if(type[0] == '#')
 			continue;
-		if(type.compare("v"))
+		if(!type.compare("v"))
 		{
 			iss>>vertex.x>>vertex.y>>vertex.z;
 			vertices.push_back(vertex);
 		}
-		else if(type.compare("f"))
+		else if(!type.compare("f"))
 		{
 			iss>>index.x>>index.y>>index.z;
 			indices.push_back(index.x);
 			indices.push_back(index.y);
 			indices.push_back(index.z);
 		}
-		else if(type.compare("vn"))
+		else if(!type.compare("vn"))
 		{
 			iss>>normal.x>>normal.y>>normal.z;
 			normals.push_back(normal);
