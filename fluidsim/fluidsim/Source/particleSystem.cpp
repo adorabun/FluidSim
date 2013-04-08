@@ -369,7 +369,7 @@ void particleSystem::Draw(const VBO& vbos){
 			for(int j = 0; j < nSlice; j++){
 				index = i*nSlice+j;
 				m_positions[index] += (it->pos);
-				m_colors[index] = glm::vec3(0.2f,0.5f, 1.f);
+				m_colors[index] = glm::vec3(0.3f,0.8f, 1.f);
 			}
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
@@ -480,15 +480,10 @@ void particleSystem::outputCenter(int& i_frame, char* s_file)
 		io_out.open(s_file, std::ios::app);
 	io_out<<i_frame<<" ";
 	glm::vec3 center = glm::vec3(0.0,0.0,0.0);
-	int n = 0;
-	std::cout<<particles.size();
 	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it)
 	{
 		center = it->pos;
 		io_out<<center.x<<" "<<center.y<<" "<<center.z<<" ";
-		n++;
-		if(n > 3)
-			break;
 	}
 	io_out<<std::endl;
 	i_frame++;
