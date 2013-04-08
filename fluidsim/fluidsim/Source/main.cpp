@@ -2,6 +2,7 @@
 #include "openGL_headers.h"
 #include "math_headers.h"
 #include "particleSystem.h"
+#include "OBJLoader.h"
 #include "stb_image_write.h"
 
 int window_width = 1024;
@@ -275,6 +276,9 @@ void deactivate_shaderprog(GLuint shaderprog)
 
 int main(int argc, char** argv)
 {
+	OBJLoader loader;
+	loader.readOBJ("bunny.obj");
+
 	{
 		unsigned int cw;
 		// Note : same result with controlfp
