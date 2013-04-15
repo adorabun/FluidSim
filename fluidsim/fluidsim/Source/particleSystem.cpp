@@ -29,7 +29,7 @@ particle::particle(){
 
 particle::particle(glm::vec3 position){
 		
-		mass = 27.f;//91.125f;19.683f;=((width-1)*radius*2)^3 * density/particle num
+		mass = 19.683f;//27.f;//19.683f;=((width-1)*radius*2)^3 * density/particle num
 		force = glm::vec3(0.f);
 
 		pos = position;
@@ -123,6 +123,119 @@ void particleSystem::initSphere(){
 
 }
 
+void particleSystem::initCube(){
+	m_positions.resize(24);
+	m_colors.resize(24);
+	m_normals.resize(24);
+	m_indices.resize(36);
+
+	//front
+	m_positions[0] = glm::vec3( -radius,  radius,  radius );
+	m_positions[1] = glm::vec3(  radius,  radius,  radius );
+	m_positions[2] = glm::vec3(  radius, -radius,  radius );
+	m_positions[3] = glm::vec3( -radius, -radius,  radius );
+	//back
+	m_positions[4] = glm::vec3( -radius,  radius, -radius );
+	m_positions[5] = glm::vec3(  radius,  radius, -radius );
+	m_positions[6] = glm::vec3(  radius, -radius, -radius );
+	m_positions[7] = glm::vec3( -radius, -radius, -radius );
+	//top
+	m_positions[ 8] = glm::vec3( -radius, radius, -radius );
+	m_positions[ 9] = glm::vec3(  radius, radius, -radius );
+	m_positions[10] = glm::vec3(  radius, radius,  radius );
+	m_positions[11] = glm::vec3( -radius, radius,  radius );
+	//bottom
+	m_positions[12] = glm::vec3( -radius, -radius, -radius );
+	m_positions[13] = glm::vec3(  radius, -radius, -radius );
+	m_positions[14] = glm::vec3(  radius, -radius,  radius );
+	m_positions[15] = glm::vec3( -radius, -radius,  radius );
+	//left
+	m_positions[16] = glm::vec3( -radius,  radius, -radius );
+	m_positions[17] = glm::vec3( -radius,  radius,  radius );
+	m_positions[18] = glm::vec3( -radius, -radius,  radius );
+	m_positions[19] = glm::vec3( -radius, -radius, -radius );
+	//right
+	m_positions[20] = glm::vec3( radius,  radius,  radius );
+	m_positions[21] = glm::vec3( radius,  radius, -radius );
+	m_positions[22] = glm::vec3( radius, -radius, -radius );
+	m_positions[23] = glm::vec3( radius, -radius,  radius );
+
+	//front
+	m_normals[0] = glm::vec3(  0.f,  0.f,  1.f );
+	m_normals[1] = glm::vec3(  0.f,  0.f,  1.f );
+	m_normals[2] = glm::vec3(  0.f,  0.f,  1.f );
+	m_normals[3] = glm::vec3(  0.f,  0.f,  1.f );
+	//back
+	m_normals[4] = glm::vec3(  0.f,  0.f, -1.f );
+	m_normals[5] = glm::vec3(  0.f,  0.f, -1.f );
+	m_normals[6] = glm::vec3(  0.f,  0.f, -1.f );
+	m_normals[7] = glm::vec3(  0.f,  0.f, -1.f );
+	//top
+	m_normals[ 8] = glm::vec3(  0.f, 1.f,  0.f );
+	m_normals[ 9] = glm::vec3(  0.f, 1.f,  0.f );
+	m_normals[10] = glm::vec3(  0.f, 1.f,  0.f );
+	m_normals[11] = glm::vec3(  0.f, 1.f,  0.f );
+	//bottom
+	m_normals[12] = glm::vec3(  0.f, -1.f,  0.f );
+	m_normals[13] = glm::vec3(  0.f, -1.f,  0.f );
+	m_normals[14] = glm::vec3(  0.f, -1.f,  0.f );
+	m_normals[15] = glm::vec3(  0.f, -1.f,  0.f );
+	//left
+	m_normals[16] = glm::vec3( -1.f,  0.f, 0.f );
+	m_normals[17] = glm::vec3( -1.f,  0.f, 0.f );
+	m_normals[18] = glm::vec3( -1.f,  0.f, 0.f );
+	m_normals[19] = glm::vec3( -1.f,  0.f, 0.f );
+	//right
+	m_normals[20] = glm::vec3( 1.f,  0.f,  0.f );
+	m_normals[21] = glm::vec3( 1.f,  0.f, 0.f );
+	m_normals[22] = glm::vec3( 1.f,  0.f,  0.f );
+	m_normals[23] = glm::vec3( 1.f,  0.f,  0.f );
+
+
+		//front
+	m_indices[0 ]= 0;
+	m_indices[1 ]= 1;
+	m_indices[2 ]= 2;
+	m_indices[3 ]= 3;
+	m_indices[4 ]= 0;
+	m_indices[5 ]= 2;
+	//back
+	m_indices[6 ]= 4;
+	m_indices[7 ]= 5;
+	m_indices[8 ]= 6;
+	m_indices[9 ]= 7;
+	m_indices[10]= 4;
+	m_indices[11]= 6;
+	//left
+	m_indices[12]= 8;
+	m_indices[13]= 9;
+	m_indices[14]= 10;
+	m_indices[15]= 11;
+	m_indices[16]= 8;
+	m_indices[17]= 10;
+	//right
+	m_indices[18]= 12;
+	m_indices[19]= 13;
+	m_indices[20]= 14;
+	m_indices[21]= 15;
+	m_indices[22]= 12;
+	m_indices[23]= 14;
+	//top
+	m_indices[24]= 16;
+	m_indices[25]= 17;
+	m_indices[26]= 18;
+	m_indices[27]= 19;
+	m_indices[28]= 16;
+	m_indices[29]= 18;
+	//bottom
+	m_indices[30]= 20;
+	m_indices[31]= 21;
+	m_indices[32]= 22;
+	m_indices[33]= 23;
+	m_indices[34]= 20;
+	m_indices[35]= 22;
+	
+}
 
 //how to handle boundary case?
 //how to speed up neighboring search?
@@ -361,16 +474,14 @@ void particleSystem::Draw(const VBO& vbos){
 	
 	LeapfrogIntegrate(0.01f);
 	
-	int index;
+	
 
 	for (std::vector<particle>::iterator it = particles.begin() ; it != particles.end(); ++it){
 
-		for(int i = 0; i < nStack; i++)
-			for(int j = 0; j < nSlice; j++){
-				index = i*nSlice+j;
-				m_positions[index] += (it->pos);
-				m_colors[index] = glm::vec3(0.3f,0.8f, 1.f);
-			}
+		for(int i=0; i<= m_positions.size(); i++){
+				m_positions[i] += (it->pos);
+				m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);
+		}
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 3 * m_positions.size() * sizeof(float), &m_positions[0], GL_STREAM_DRAW);
@@ -409,9 +520,9 @@ void particleSystem::Draw(const VBO& vbos){
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		for(int i = 0; i < nStack; i++)
-			for(int j = 0; j < nSlice; j++){
-				m_positions[i*nSlice+j] -= (it->pos);
+		for(int i=0; i<= m_positions.size(); i++){
+					m_positions[i] -= (it->pos);
+					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);
 		}
 
 	}

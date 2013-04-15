@@ -63,7 +63,7 @@ public:
 private:
 	void initParticles(int number);
 	void initSphere();
-
+	void initCube();
 	
 	void computeForce(const particleGrid& ps, particle& pi);
 	void computeDensity(const particleGrid& ps, particle& pi);
