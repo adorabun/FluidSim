@@ -33,6 +33,7 @@ public:
 	float color_surface;//Cs
 
 	float pressure;
+
 };
 
 class particleSystem
@@ -46,8 +47,8 @@ public:
 	void drawWireGrid();
 
 	typedef std::vector<particle> particleGrid;
-	static float nSlice;
-	static float nStack;
+	static int nSlice;
+	static int nStack;
 	static float radius;
 	static float tension_coeff;//sigma
 	static float surfaceThreshold;//l

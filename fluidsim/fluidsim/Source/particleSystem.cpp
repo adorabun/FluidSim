@@ -7,9 +7,9 @@
 #define SMOOTH_CORE_RADIUS 1.f //three times the average distance
 
 
-float particleSystem::nSlice = 6;
-float particleSystem::nStack = 6;
-float particleSystem::radius = 0.15;
+int particleSystem::nSlice = 6;
+int particleSystem::nStack = 6;
+float particleSystem::radius = 0.15f;
 float particleSystem::tension_coeff = 50.f;//sigma
 float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
@@ -17,11 +17,12 @@ float particleSystem::xstart = 0.f;
 
 float particleSystem::ystart = 0.f;
 float particleSystem::zstart = 0.f;
-float particleSystem::xend = 11.0f;
-float particleSystem::yend = 12.0f;
-float particleSystem::zend = 11.0f;
+float particleSystem::xend = 4.0f;
+float particleSystem::yend = 10.0f;
+float particleSystem::zend = 4.0f;
 
-#define offset glm::vec3(3.5f, 4.f, 3.5f)
+#define offset1 glm::vec3(0.1f, 2.f, 0.1f)
+#define offset2 glm::vec3(0.1f, 6.f, 0.1f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -29,7 +30,7 @@ particle::particle(){
 
 particle::particle(glm::vec3 position){
 		
-		mass = 19.683f;//27.f;//19.683f;=((width-1)*radius*2)^3 * density/particle num
+		mass = 27.f;//27.f;//19.683f;=(width*radius*2)^3 * density/particle num
 		force = glm::vec3(0.f);
 
 		pos = position;
@@ -69,18 +70,29 @@ particleSystem::particleSystem(int number){
 void particleSystem::initParticles(int number){
 
 	float stepsize = 2.f * radius;
-
+	int total = number * number * number;
 	
-	particles.resize(number * number * number);
+	particles.resize(total*2);
 	int id;
+
+
 	for(int x = 0; x < number; x++)
 		for(int y = 0; y < number; y++)
 			for(int z = 0; z < number; z++){
 				id = x*number*number + y*number + z;
-				particle p(glm::vec3(x, y, z) * stepsize + offset);
-				p.id = id;
-				particles[id] = p;
+				
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1);
+				p1.id = id;
+				p1.vel.x = 5.f;
+				particles[id] = p1;
+				
+				id += total;
+				particle p2(glm::vec3(x, y, z) * stepsize + offset2);
+				p2.id = id;
+				particles[id] = p2;
+
 			}
+
 }
 
 
@@ -480,7 +492,10 @@ void particleSystem::Draw(const VBO& vbos){
 
 		for(int i=0; i<= m_positions.size(); i++){
 				m_positions[i] += (it->pos);
-				m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);
+				if(it->id < particles.size() * 0.5)
+					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);
+				else
+					m_colors[i] = glm::vec3(0.67f, 0.4f, 0.92f);
 		}
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
