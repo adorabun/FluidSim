@@ -27,9 +27,9 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 20.f;
+float eye_distance = 15.f;
 float head = 25.f, pitch = 55.f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 2.0f, 0.0f);
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 3.0f, 0.0f);
 
 //----------functions----------//
 // declare
@@ -276,8 +276,8 @@ void deactivate_shaderprog(GLuint shaderprog)
 
 int main(int argc, char** argv)
 {
-	OBJLoader loader;
-	loader.readOBJ("bunny.obj");
+	//OBJLoader loader;
+	//loader.readOBJ("bunny.obj");
 
 	{
 		unsigned int cw;

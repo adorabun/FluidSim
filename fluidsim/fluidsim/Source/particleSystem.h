@@ -73,8 +73,7 @@ private:
 
 private:
 	particleGrid particles;
-
-	class Grid{
+class Grid{
 	public:
 		void resize(int x, int y, int z, const particleGrid& ps);
 		void refillGrid(const particleGrid& ps);
