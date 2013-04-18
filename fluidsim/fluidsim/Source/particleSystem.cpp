@@ -359,12 +359,12 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	double time5= glfwGetTime();
 
-	std::cout<<"============"<<frameCount<<std::endl;
-	std::cout << "push   Particle = 2-1=" << time1-time0<<std::endl;
-	std::cout << "get    Neighbor = 2-1=" << time2-time1<<std::endl;
-	std::cout << "compute Density = 3-2=" << time3-time2<<std::endl;
-	std::cout << "compute   Force = 4-3=" << time4-time3<<std::endl;
-	std::cout << "copy       back = 5-4=" << time5-time4<<std::endl;
+	/*std::cout<<"============"<<frameCount<<std::endl
+			 << "push   Particle = 2-1=" << time1-time0<<std::endl
+			 << "get    Neighbor = 2-1=" << time2-time1<<std::endl
+			 << "compute Density = 3-2=" << time3-time2<<std::endl
+			 << "compute   Force = 4-3=" << time4-time3<<std::endl
+			 << "copy       back = 5-4=" << time5-time4<<std::endl;*/
 
 }
 
@@ -671,8 +671,9 @@ void SpaceGrid::pushParticle(particle* pt, int frameID){
 	
 	int index = positionToVecIndex(pt->pos);
 
-	if(index == -1)
-		return;
+	//if(index == -1)
+	//	return;
+
 
 	if(mymap[index].frameID < frameID){
 		mymap[index].frameID = frameID;
@@ -694,13 +695,13 @@ void SpaceGrid::getNeighbors(particle* pt){
 		for(int y=-1; y<=1; y++)
 			for(int z=-1; z<=1; z++){
 				currGridIndex = gridIndex + glm::vec3(x,y,z);
-				//if(IfWithinBoundry(currGridIndex)){
+
 				vecIndex = gridIndexToVecIndex(currGridIndex);
 
-				for(int i=0; i < mymap[vecIndex].ps.size(); i++)
-					temp.push_back(mymap[vecIndex].ps[i]);
-				//}
+				temp.insert(temp.end(), mymap[vecIndex].ps.begin(), mymap[vecIndex].ps.end() );
+					
 			}
+
 	pt->ngbrs = temp;
 	assert(pt->ngbrs.size()>0);
 
