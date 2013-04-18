@@ -24,6 +24,7 @@
     <ClInclude Include="Source\particleSystem.h" />
     <ClInclude Include="Source\stb_image.h" />
     <ClInclude Include="Source\stb_image_write.h" />
+    <ClInclude Include="SpaceGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exportMel.txt" />
