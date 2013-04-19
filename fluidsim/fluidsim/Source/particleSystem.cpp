@@ -11,7 +11,8 @@ int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
 float particleSystem::tension_coeff = 50.f;//sigma
-float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
+float particleSystem::surfaceThreshold = 0.5
+	f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
 
@@ -61,9 +62,9 @@ particleSystem::particleSystem(int number){
 	initParticles(number);
 	initSphere();
 	
-	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
-	int gy = floor(yend/SMOOTH_CORE_RADIUS) + 1;
-	int gz = floor(zend/SMOOTH_CORE_RADIUS) + 1;
+	int gx = floor(xend/SMOOTH_CORE_RADIUS);
+	int gy = floor(yend/SMOOTH_CORE_RADIUS);
+	int gz = floor(zend/SMOOTH_CORE_RADIUS);
 
 	//gridcells.resize(gx, gy, gz, particles);
 	mygrid.dim = glm::vec3(gx,gy,gz);
@@ -326,7 +327,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		//mygrid.getNeighbors(target[i]);
 			
 		computeDensity(target[i]);
-		assert(target[i]->actual_density>0);
+		assert(target[i]->actual_density > 0);
 
 		target[i]->pressure = target[i]->gas_constant * (target[i]->actual_density - target[i]->rest_density);
 	}
@@ -416,7 +417,7 @@ inline glm::vec3 poly6KernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen <= h){
-		float t =  945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
+		float t =  - 945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
 		return t*r;
 	}
 		
@@ -446,7 +447,7 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen > 0 && rLen <= h){
-		float t = -45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
+		float t = - 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
 		return t * r;
 	}
 	return glm::vec3(0.f);
@@ -463,7 +464,7 @@ inline float viscosityKernel(glm::vec3 r, float h){
 inline float viscosityKernelLaplacian(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 	if(rLen <= h)
-		return 45.f * ( h - rLen ) / ( M_PI + pow(h, 6) ) ;
+		return 45.f * ( h - rLen ) / ( M_PI * pow(h, 6) ) ;
 	return 0.f;
 }
 
@@ -487,6 +488,7 @@ void particleSystem::computeForce(particle* pi){
 
 		r = pi->pos - pi->ngbrs[j]->pos;
 
+		int a=j;
 		
 		f_pressure -=  massOverDensity * ( pi->pressure + pi->ngbrs[j]->pressure ) * 0.5f * spikyKernelGradient(r, SMOOTH_CORE_RADIUS);
 
@@ -671,8 +673,8 @@ void SpaceGrid::pushParticle(particle* pt, int frameID){
 	
 	int index = positionToVecIndex(pt->pos);
 
-	//if(index == -1)
-	//	return;
+	if(index == -1)
+		return;
 
 
 	if(mymap[index].frameID < frameID){
@@ -703,6 +705,9 @@ void SpaceGrid::getNeighbors(particle* pt){
 			}
 
 	pt->ngbrs = temp;
+
+	//std::cout<<pt->ngbrs.size()<<std::endl;
+
 	assert(pt->ngbrs.size()>0);
 
 }
@@ -733,11 +738,11 @@ int SpaceGrid::positionToVecIndex(glm::vec3 p){
 }
 
 bool SpaceGrid::IfWithinBoundry(glm::vec3 gridIndex){
-	if(gridIndex.x < 0 || gridIndex.x >= dim.x)
+	if(gridIndex.x < 0 || gridIndex.x > dim.x)
 		return false;
-	if(gridIndex.y < 0 || gridIndex.y >= dim.y)
+	if(gridIndex.y < 0 || gridIndex.y > dim.y)
 		return false;
-	if(gridIndex.z < 0 || gridIndex.z >= dim.z)
+	if(gridIndex.z < 0 || gridIndex.z > dim.z)
 		return false;
 	
 	return true;
