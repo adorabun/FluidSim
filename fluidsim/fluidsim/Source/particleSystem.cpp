@@ -110,12 +110,12 @@ void particleSystem::initParticles(int number){
 			for(int z = 0; z < number; z++){
 				id = x*number*number + y*number + z;
 				
-				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
 				p1.id = id;
 				particles[id] = p1;
 				
 				id += total;
-				particle p2(glm::vec3(x, y, z) * stepsize + offset2, 1500.f);
+				particle p2(glm::vec3(x, y, z) * stepsize + offset2, 1000.f);
 				p2.id = id;
 				particles[id] = p2;
 
@@ -145,7 +145,7 @@ void particleSystem::initSphere(){
 			float z = cos(j*phi);
 
 			int index = i*nSlice+j;
-			m_positions[index] = glm::vec3(x, y, z) * radius;
+			m_positions[index] = glm::vec3(x, y, z) * radius * 0.8f;;
 			m_normals[index] = glm::vec3(x, y, z);
 		}
 
@@ -279,13 +279,13 @@ void particleSystem::initCube(){
 
 
 void particleSystem::LeapfrogIntegrate(float dt){
-		float halfdt = 0.5f * dt;
+	float halfdt = 0.5f * dt;
 	std::vector<particle> target = particles;// target is a copy!
 	std::vector<particle>& source = particles;//source is a ptr!
 	glm::vec3 collision_normal = glm::vec3(0.f);
 
 	
-	double time0 = glfwGetTime();
+	//double time0 = glfwGetTime();
 	for (int i=0; i < target.size(); i++){
 		target[i].pos = source[i].pos + source[i].vel * dt 
 						+ halfdt * dt * source[i].force / source[i].actual_density;
@@ -300,14 +300,14 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	}
 
-	double time1 = glfwGetTime();
+	//double time1 = glfwGetTime();
 
 	
 	for (int i=0; i < target.size(); i++){
 		mygrid.getNeighbors(target[i]);
 	}
 	
-	double time2= glfwGetTime();
+	//double time2= glfwGetTime();
 
 	//calculate actual density 
 	for (int i=0; i < target.size(); i++){
@@ -320,12 +320,12 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	
-	double time3= glfwGetTime();
+	//double time3= glfwGetTime();
 	for (int i=0; i < target.size(); i++){
 		
 		computeForce(target[i]);	
 	}
-	double time4= glfwGetTime();
+	//double time4= glfwGetTime();
 
 	//calculate actual density 
 	/*for (int i=0; i < target.size(); i++){
@@ -345,7 +345,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		source[i].actual_density = target[i].actual_density;	
 	}
 
-	double time5 = glfwGetTime();
+	//double time5 = glfwGetTime();
 
 	/*std::cout<<"============"<<frameCount<<std::endl
 			 << "push   Particle = 2-1=" << time1-time0<<std::endl
@@ -727,7 +727,7 @@ void SpaceGrid::getNeighbors(particle& pt){
 
 	//std::cout<<pt->ngbrs.size()<<std::endl;
 
-	bool containitself = false;
+	/*bool containitself = false;
 	for(int i=0; i<temp.size(); i++){
 		if( temp[i]->id == pt.id){
 			containitself = true;
@@ -736,7 +736,7 @@ void SpaceGrid::getNeighbors(particle& pt){
 	}
 
 	if(!containitself){
-		//std::cout  <<" id= "<<pt->id<<std::endl;
+		std::cout  <<" id= "<<pt->id<<std::endl;
 		if(pt.id==37){
 			gridIndex = positionToGridIndex(pt.pos);
 			vecIndex = gridIndexToVecIndex(gridIndex);
@@ -745,7 +745,7 @@ void SpaceGrid::getNeighbors(particle& pt){
 				<<"vecIndex = "<<vecIndex<<std::endl;
 
 		}
-	}
+	}*/
 
 	assert(pt.ngbrs.size()>0);
 
