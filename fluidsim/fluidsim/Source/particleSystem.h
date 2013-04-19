@@ -2,9 +2,12 @@
 #define PARTICLE_SYSTEM_H_INCLUDED
 
 #include <vector>
+#include <map>
+
 
 #include "openGL_headers.h"
 #include "math_headers.h"
+#include "Mesh.h"
 
 #define M_PI 3.1415926
 
@@ -33,6 +36,32 @@ public:
 	float color_surface;//Cs
 
 	float pressure;
+
+	std::vector<particle*> ngbrs;
+	
+};
+
+struct Cell{
+	int frameID;
+	std::vector<particle*> ps;
+	Cell():frameID(-1){};
+};
+
+class SpaceGrid{
+	public:
+		void pushParticle(particle* pt, int frameID);
+		void getNeighbors(particle* pt);
+		glm::vec3 dim;
+
+	protected:
+		
+		glm::vec3 positionToGridIndex(glm::vec3 p);
+		int gridIndexToVecIndex(glm::vec3 index);
+		int positionToVecIndex(glm::vec3 p);
+		bool IfWithinBoundry(glm::vec3 gridIndex);
+		
+		std::map<int, Cell> mymap;
+
 };
 
 class particleSystem
@@ -40,14 +69,15 @@ class particleSystem
 public:
 	particleSystem();
 	particleSystem(int number);
+	particleSystem(int number, Mesh& mesh);
 
+	int frameCount;
 	void Draw(const VBO& vbos);
 	void LeapfrogIntegrate(float dt);
 	void drawWireGrid();
 
-	typedef std::vector<particle> particleGrid;
-	static float nSlice;
-	static float nStack;
+	static int nSlice;
+	static int nStack;
 	static float radius;
 	static float tension_coeff;//sigma
 	static float surfaceThreshold;//l
@@ -63,43 +93,24 @@ public:
 private:
 	void initParticles(int number);
 	void initSphere();
-
+	void initCube();
 	
-	void computeForce(const particleGrid& ps, particle& pi);
-	void computeDensity(const particleGrid& ps, particle& pi);
+	void computeForce(particle* pi);
+	void computeDensity(particle* pi);
 	bool checkIfOutOfBoundry(const particle& p);
-	bool CollisionDectection(const particle& p, glm::vec3& n);
-
+	bool CollisionDetection(const particle& p, glm::vec3& n);
 private:
-	particleGrid particles;
+	std::vector<particle*> particles;
 
-	class Grid{
-	public:
-		void resize(int x, int y, int z, const particleGrid& ps);
-		void refillGrid(const particleGrid& ps);
 
-		void pushParticle(const particle& p);
-		void getNeighbors(const particleGrid& ps, const particle& p, particleGrid& des);
-		
-
-		glm::vec3 positionToGridIndex(glm::vec3 p);
-		int gridIndexToVecIndex(glm::vec3 index);
-		int positionToVecIndex(glm::vec3 p);
-		bool IfWithinBoundry(glm::vec3 gridIndex);
-		
-		glm::vec3 dim;
-
-		std::vector<std::vector<int>> GridData;
-	};
-
-	Grid gridcells;
+	SpaceGrid mygrid;
 
 	std::vector<glm::vec3> m_positions;
 	std::vector<glm::vec3> m_normals;
 	std::vector<glm::vec3> m_colors;
 	std::vector<unsigned short> m_indices;
 
-	
+	Mesh* container;
 };
 
 #endif

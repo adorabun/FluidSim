@@ -2,7 +2,7 @@
 #include "openGL_headers.h"
 #include "math_headers.h"
 #include "particleSystem.h"
-#include "OBJLoader.h"
+#include "Mesh.h"
 #include "stb_image_write.h"
 
 int window_width = 1024;
@@ -27,9 +27,9 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 35.f;
+float eye_distance = 15.f;
 float head = 25.f, pitch = 55.f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 0.0f, 0.0f);
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 3.0f, 0.0f);
 
 //----------functions----------//
 // declare
@@ -276,9 +276,10 @@ void deactivate_shaderprog(GLuint shaderprog)
 
 int main(int argc, char** argv)
 {
-	OBJLoader loader;
-	loader.readOBJ("bunny.obj");
-
+	Mesh mesh;
+	mesh.readOBJ("obj/capsule_half.obj");
+	mesh.scale(5.0f);
+	
 	{
 		unsigned int cw;
 		// Note : same result with controlfp
@@ -323,8 +324,8 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 
 	//particleSystem ps(16);//16^3=4096
-	particleSystem ps(16);
-
+	particleSystem ps(6, mesh);//1728
+	
     lastTime = glfwGetTime();
     while(run)
     {
@@ -344,6 +345,8 @@ int main(int argc, char** argv)
 		
 		ps.Draw(vbo_handle);
 		ps.drawWireGrid();
+
+		mesh.draw(vbo_handle);
 
         deactivate_shaderprog(m_shaderprog_handle);
 

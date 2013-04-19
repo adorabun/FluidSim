@@ -12,18 +12,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\OBJLoader.cpp" />
+    <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\particleSystem.cpp" />
     <ClCompile Include="Source\stb_image.c" />
     <ClCompile Include="Source\stb_image_write.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\math_headers.h" />
-    <ClInclude Include="Source\OBJLoader.h" />
+    <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\openGL_headers.h" />
     <ClInclude Include="Source\particleSystem.h" />
     <ClInclude Include="Source\stb_image.h" />
     <ClInclude Include="Source\stb_image_write.h" />
+    <ClInclude Include="SpaceGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exportMel.txt" />
