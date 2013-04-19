@@ -2,7 +2,6 @@
 #include "openGL_headers.h"
 #include "math_headers.h"
 #include "particleSystem.h"
-#include "Mesh.h"
 #include "stb_image_write.h"
 
 int window_width = 1024;
@@ -276,10 +275,6 @@ void deactivate_shaderprog(GLuint shaderprog)
 
 int main(int argc, char** argv)
 {
-	Mesh mesh;
-	mesh.readOBJ("obj/capsule_half.obj");
-	mesh.scale(5.0f);
-	
 	{
 		unsigned int cw;
 		// Note : same result with controlfp
@@ -324,7 +319,7 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 
 	//particleSystem ps(16);//16^3=4096
-	particleSystem ps(6, mesh);//1728
+	particleSystem ps(6);//1728
 	
     lastTime = glfwGetTime();
     while(run)
@@ -342,11 +337,8 @@ int main(int argc, char** argv)
         }*/
         activate_shaderprog(m_shaderprog_handle);
 		
-		
 		ps.Draw(vbo_handle);
 		ps.drawWireGrid();
-
-		mesh.draw(vbo_handle);
 
         deactivate_shaderprog(m_shaderprog_handle);
 

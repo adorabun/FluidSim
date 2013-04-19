@@ -69,7 +69,6 @@ class particleSystem
 public:
 	particleSystem();
 	particleSystem(int number);
-	particleSystem(int number, Mesh& mesh);
 
 	int frameCount;
 	void Draw(const VBO& vbos);

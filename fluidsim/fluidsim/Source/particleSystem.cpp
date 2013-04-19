@@ -61,29 +61,41 @@ particleSystem::particleSystem(int number){
 	initParticles(number);
 	initSphere();
 	
-	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
-	int gy = floor(yend/SMOOTH_CORE_RADIUS) + 1;
-	int gz = floor(zend/SMOOTH_CORE_RADIUS) + 1;
-
-	//gridcells.resize(gx, gy, gz, particles);
-	mygrid.dim = glm::vec3(gx,gy,gz);
-}
-particleSystem::particleSystem(int number, Mesh& mesh)
-{
-	frameCount = 0;
-
-	initParticles(number);
-	initSphere();
-	
-	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
-	int gy = floor(yend/SMOOTH_CORE_RADIUS) + 1;
-	int gz = floor(zend/SMOOTH_CORE_RADIUS) + 1;
+	int gx = floor(xend/SMOOTH_CORE_RADIUS);
+	int gy = floor(yend/SMOOTH_CORE_RADIUS);
+	int gz = floor(zend/SMOOTH_CORE_RADIUS);
 
 	//gridcells.resize(gx, gy, gz, particles);
 	mygrid.dim = glm::vec3(gx,gy,gz);
 
-	container = &mesh;
+	container = new Mesh();
+	container->readOBJ("obj/capsule_half.obj");
+	container->scale(5.0f);
 }
+//void particleSystem::initParticles(int number){
+//
+//	float stepsize = 2.f * radius;
+//	int total = number * number * number;
+//	
+//	particles.resize(total);
+//	
+//	int id;
+//
+//
+//	for(int x = 0; x < number; x++)
+//		for(int y = 0; y < number; y++)
+//			for(int z = 0; z < number; z++){
+//				id = x*number*number + y*number + z;
+//				
+//				particle* p1 = new particle(glm::vec3(x, y, z) * stepsize + offset1);
+//				p1->id = id;
+//				p1->vel.y = -5.f;
+//				particles[id] = p1;
+//
+//			}
+//
+//}
+
 //void particleSystem::initParticles(int number){
 //
 //	float stepsize = 2.f * radius;
@@ -317,8 +329,8 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	for (int i=0; i < target.size(); i++){
 		target[i]->pos = source[i]->pos + source[i]->vel * dt 
 						+ halfdt * dt * source[i]->force / source[i]->actual_density;
-		//if( container->lineIntersect(source[i]->pos, target[i]->pos, collision_normal) ){
-		if( CollisionDetection(*(target[i]), collision_normal) ){
+		if( container->lineIntersect(source[i]->pos, target[i]->pos, collision_normal) ){
+		//if( CollisionDetection(*(target[i]), collision_normal) ){
 			glm::vec3 vn = (source[i]->vel * collision_normal) * collision_normal;//decompose v along normal
 			glm::vec3 vt = source[i]->vel - vn;
 			target[i]->vel = 0.9f * vt - 0.8f * vn;//flip normal direction speed
@@ -342,7 +354,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		//mygrid.getNeighbors(target[i]);
 			
 		computeDensity(target[i]);
-		assert(target[i]->actual_density>0);
+		assert(target[i]->actual_density > 0);
 
 		target[i]->pressure = target[i]->gas_constant * (target[i]->actual_density - target[i]->rest_density);
 	}
@@ -432,7 +444,7 @@ inline glm::vec3 poly6KernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen <= h){
-		float t =  945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
+		float t =  - 945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
 		return t*r;
 	}
 		
@@ -462,7 +474,7 @@ inline glm::vec3 spikyKernelGradient(glm::vec3 r, float h){
 	float rLen = glm::length(r);
 
 	if(rLen > 0 && rLen <= h){
-		float t = -45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
+		float t = - 45.f * ( ( h*h + rLen*rLen ) / rLen - 2.f * h ) / (M_PI * pow(h, 6));
 		return t * r;
 	}
 	return glm::vec3(0.f);
@@ -503,6 +515,7 @@ void particleSystem::computeForce(particle* pi){
 
 		r = pi->pos - pi->ngbrs[j]->pos;
 
+		int a=j;
 		
 		f_pressure -=  massOverDensity * ( pi->pressure + pi->ngbrs[j]->pressure ) * 0.5f * spikyKernelGradient(r, SMOOTH_CORE_RADIUS);
 
@@ -543,10 +556,11 @@ void particleSystem::computeDensity(particle* pi){
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
+	container->draw(vbos);
+
 	LeapfrogIntegrate(0.01f);
 	frameCount++;
 	
-
 	for (int id=0; id<particles.size(); id++ ){
 
 		for(int i=0; i< m_positions.size(); i++){
@@ -719,6 +733,8 @@ void SpaceGrid::getNeighbors(particle* pt){
 			}
 
 	pt->ngbrs = temp;
+	//std::cout<<pt->ngbrs.size()<<std::endl;
+
 	assert(pt->ngbrs.size()>0);
 
 }
@@ -749,11 +765,11 @@ int SpaceGrid::positionToVecIndex(glm::vec3 p){
 }
 
 bool SpaceGrid::IfWithinBoundry(glm::vec3 gridIndex){
-	if(gridIndex.x < 0 || gridIndex.x >= dim.x)
+	if(gridIndex.x < 0 || gridIndex.x > dim.x)
 		return false;
-	if(gridIndex.y < 0 || gridIndex.y >= dim.y)
+	if(gridIndex.y < 0 || gridIndex.y > dim.y)
 		return false;
-	if(gridIndex.z < 0 || gridIndex.z >= dim.z)
+	if(gridIndex.z < 0 || gridIndex.z > dim.z)
 		return false;
 	
 	return true;
