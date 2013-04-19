@@ -1,9 +1,56 @@
-﻿Build started 4/18/2013 9:05:34 PM.
-     1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (clean target(s)).
-     1>_PrepareForClean:
-         Deleting file "Release\fluidsim.lastbuildstate".
-     1>Done Building Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" (clean target(s)).
+﻿Build started 4/19/2013 4:23:43 PM.
+     1>Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Release\fluidsim.unsuccessfulbuild".
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../glm /I../glew/include /I../glfw/include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Source\particleSystem.cpp
+         particleSystem.cpp
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\./core/func_common.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\core\func_common.inl : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>c:\users\adair\documents\github\fluidsim\fluidsim\glm\./core/func_integer.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>Source\particleSystem.cpp(36): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(66): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>Source\particleSystem.cpp(67): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>Source\particleSystem.cpp(68): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>Source\particleSystem.cpp(129): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(130): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(289): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(306): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(313): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(324): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(341): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(409): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(419): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(431): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(440): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(449): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(459): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(466): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>Source\particleSystem.cpp(485): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(518): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(549): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(551): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(598): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(669): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(731): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\particleSystem.cpp(768): warning C4244: 'return' : conversion from 'float' to 'int', possible loss of data
+         All outputs are up-to-date.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Release\fluidsim.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:../glew/lib /LIBPATH:../glfw/lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib glew32.lib glu32.lib opengl32.lib glfw.lib glfwdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\fluidsim.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Release\fluidsim.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Release\fluidsim.lib" /MACHINE:X86 Release\main.obj
+         Release\OBJLoader.obj
+         Release\particleSystem.obj
+         Release\stb_image.obj
+         Release\stb_image_write.obj
+         Generating code
+         Finished generating code
+         fluidsim.vcxproj -> C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Release\fluidsim.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\Release\fluidsim.exe;#1" /manifest Release\fluidsim.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Release\fluidsim.unsuccessfulbuild".
+         Touching "Release\fluidsim.lastbuildstate".
+     1>Done Building Project "C:\Users\adair\Documents\GitHub\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.03
+Time Elapsed 00:00:04.58
