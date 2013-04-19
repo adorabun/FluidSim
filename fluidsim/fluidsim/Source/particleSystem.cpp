@@ -11,8 +11,7 @@ int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
 float particleSystem::tension_coeff = 50.f;//sigma
-float particleSystem::surfaceThreshold = 0.5
-	f;//l need to figure out value by printing
+float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
 
