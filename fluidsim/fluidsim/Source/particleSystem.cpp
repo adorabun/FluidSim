@@ -22,7 +22,7 @@ float particleSystem::yend = 10.0f;
 float particleSystem::zend = 4.0f;
 
 #define offset1 glm::vec3(2.2f, 2.f, 3.5f)
-#define offset2 glm::vec3(2.2f, 5.5f, 3.5f)
+#define offset2 glm::vec3(2.2f, 4.f, 3.5f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -41,8 +41,8 @@ particle::particle(glm::vec3 position, float rho){
 
 		
 
-		viscosity_coef = 100.f;//10.f
-		gas_constant = 30.f;//3.f
+		viscosity_coef = 800.f;//10.f
+		gas_constant = 50.f;//3.f
 		
 		temperature = 500;
 
