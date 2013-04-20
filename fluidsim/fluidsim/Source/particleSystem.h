@@ -15,7 +15,7 @@ class particle{
 public:
 	particle();
 
-	particle(glm::vec3 position);
+	particle(glm::vec3 position, float rho);
 
 	int id;
 	float mass;
@@ -49,8 +49,8 @@ struct Cell{
 
 class SpaceGrid{
 	public:
-		void pushParticle(particle* pt, int frameID);
-		void getNeighbors(particle* pt);
+		void pushParticle(particle& pt, int frameID);
+		void getNeighbors(particle& pt);
 		glm::vec3 dim;
 
 	protected:
@@ -94,12 +94,12 @@ private:
 	void initSphere();
 	void initCube();
 	
-	void computeForce(particle* pi);
-	void computeDensity(particle* pi);
+	void computeForce(particle& pi);
+	void computeDensity(particle& pi);
 	bool checkIfOutOfBoundry(const particle& p);
-	bool CollisionDetection(const particle& p, glm::vec3& n);
+	bool CollisionDectection(particle& p, glm::vec3& n);
 private:
-	std::vector<particle*> particles;
+	std::vector<particle> particles;
 
 
 	SpaceGrid mygrid;

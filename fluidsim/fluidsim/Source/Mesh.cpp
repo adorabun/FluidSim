@@ -157,17 +157,24 @@ bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::
 {
 	//glm::vec3 V = glm::normalize(V0);
 	glm::vec3 dir = p_end - p_start;
+	if(glm::length(dir) < EPSILON)
+		return false;
 	glm::vec3 pos = p_start;
-	float t = -1;
-	for(unsigned int i = 0; i < face_normals.size(); ++i)
+	float t = -1.0f;
+	unsigned int n = face_normals.size();
+	for(unsigned int i = 0; i < n; ++i)
 	{
 		glm::vec3 P1 = vertices[indices[i * 3 + 0]];
 		glm::vec3 P2 = vertices[indices[i * 3 + 1]];
 		glm::vec3 P3 = vertices[indices[i * 3 + 2]];
 
-		glm::vec3 face_normal = -face_normals[i];
-		//if(glm::dot(face_normal, dir) < 0)
-			//face_normal = -face_normal;
+		if(P1 == P2 || P1 == P3 || P2 == P3)
+			continue;
+
+		//glm::vec3 face_normal = -face_normals[i];
+		glm::vec3 face_normal = glm::normalize(glm::cross(P2 - P1, P3 - P1));
+		if(glm::dot(face_normal, dir) < 0)
+			face_normal = -face_normal;
 		float denominator = glm::dot(face_normal, dir);
 		if((denominator < EPSILON) && (denominator > -EPSILON))
 			continue;
@@ -184,13 +191,11 @@ bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::
 				float s2 = triangleArea(P, P3, P1) / s;
 				float s3 = triangleArea(P, P1, P2) / s;
 				// better solution?
-				if((s1 > 0) && (s1 < 1) && (s2 > 0) && (s2 < 1) && (s3 > 0) && (s3 < 1) && (s1 + s2 + s3 - 1 < EPSILON) && (s1 + s2 + s3 - 1 > -EPSILON))
+				if((s1 > EPSILON) && (s1 < 1) && (s2 > EPSILON) && (s2 < 1) && (s3 > EPSILON) && (s3 < 1) && (s1 + s2 + s3 - 1 < EPSILON) && (s1 + s2 + s3 - 1 > -EPSILON))
 				{
 					normal = face_normal;
 					return true;
 				}
-				else
-					continue;
 			}
 		}
 	}

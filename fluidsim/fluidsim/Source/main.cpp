@@ -249,7 +249,7 @@ void grabScreen(const particleSystem& ps)
     }
 
     char anim_filename[2048];
-    sprintf_s(anim_filename, 2048, "output/sph.png", frame_num);
+    sprintf_s(anim_filename, 2048, "output/sph_%04d.png", frame_num);
 
     stbi_write_png(anim_filename, window_width, window_height, 3, bitmapData, window_width * 3);
 
@@ -320,7 +320,7 @@ int main(int argc, char** argv)
 
 	//particleSystem ps(16);//16^3=4096
 	particleSystem ps(6);//1728
-	
+
     lastTime = glfwGetTime();
     while(run)
     {

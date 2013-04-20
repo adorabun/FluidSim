@@ -13,7 +13,7 @@
 #include "math_headers.h"
 #include "openGL_headers.h"
 
-#define EPSILON 0.00001
+#define EPSILON 0.000001f
 
 class Mesh
 {
