@@ -108,7 +108,7 @@ private:
 	std::vector<glm::vec3> m_normals;
 	std::vector<glm::vec3> m_colors;
 	std::vector<unsigned short> m_indices;
-
+	
 	Mesh* container;
 };
 

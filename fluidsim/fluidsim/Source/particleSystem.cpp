@@ -21,8 +21,8 @@ float particleSystem::xend = 4.0f;
 float particleSystem::yend = 10.0f;
 float particleSystem::zend = 4.0f;
 
-#define offset1 glm::vec3(0.1f, 2.f, 0.1f)
-#define offset2 glm::vec3(0.1f, 5.5f, 0.1f)
+#define offset1 glm::vec3(2.2f, 2.f, 3.5f)
+#define offset2 glm::vec3(2.2f, 5.5f, 3.5f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -61,16 +61,16 @@ particleSystem::particleSystem(int number){
 
 	container = new Mesh();
 	container->readOBJ("obj/capsule_half.obj");
-	container->scale(3.0f);
+	container->scale(2.5f);
 
 	frameCount = 0;
 
 	initParticles(number);
 	initSphere();
 	
-	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
-	int gy = floor(yend/SMOOTH_CORE_RADIUS) + 1;
-	int gz = floor(zend/SMOOTH_CORE_RADIUS) + 1;
+	int gx = floor(10.0/SMOOTH_CORE_RADIUS) + 1;
+	int gy = floor(30.0/SMOOTH_CORE_RADIUS) + 1;
+	int gz = floor(10.0/SMOOTH_CORE_RADIUS) + 1;
 
 	//gridcells.resize(gx, gy, gz, particles);
 	mygrid.dim = glm::vec3(gx,gy,gz);
@@ -138,7 +138,7 @@ void particleSystem::initParticles(int number){
 			for(int z = 0; z < number; z++){
 				id = x*number*number + y*number + z;
 				
-				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 500.f);
 				p1.id = id;
 				particles[id] = p1;
 				
@@ -570,11 +570,8 @@ void particleSystem::computeDensity(particle& pi){
 
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
-	
-	container->draw(vbos);
 
 	LeapfrogIntegrate(0.01f);
-	
 	
 	for (int id=0; id<particles.size(); id++ ){
 
@@ -631,6 +628,7 @@ void particleSystem::Draw(const VBO& vbos){
 		}
 
 	}
+	container->draw(vbos);
 }
 
 

@@ -311,13 +311,13 @@ int main(int argc, char** argv)
     glfwSetMouseButtonCallback(mouseClick);
     glfwSetMousePosCallback(mouseMotion);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glViewport(0, 0, window_width, window_height);
 
     VBO vbo_handle;
-
+	
 	//particleSystem ps(16);//16^3=4096
 	particleSystem ps(6);//1728
 
@@ -338,7 +338,7 @@ int main(int argc, char** argv)
         activate_shaderprog(m_shaderprog_handle);
 		
 		ps.Draw(vbo_handle);
-		ps.drawWireGrid();
+		//ps.drawWireGrid();
 
         deactivate_shaderprog(m_shaderprog_handle);
 

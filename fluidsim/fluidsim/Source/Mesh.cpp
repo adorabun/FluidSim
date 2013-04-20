@@ -10,6 +10,7 @@ Mesh::~Mesh()
 	normals.clear();
 	indices.clear();
 	colors.clear();
+	face_normals.clear();
 }
 
 void Mesh::scale(float scale)
@@ -86,8 +87,14 @@ int Mesh::readOBJ(const char* file)
 			normals[index.y] = temp_normals[normal_index.y];
 			normals[index.z] = temp_normals[normal_index.z];
 			// calculate face normals
-			face_normal = glm::normalize((normals[index.x] + normals[index.y] + normals[index.z]) / 3.0f);
-			face_normals.push_back(face_normal);
+			if(vertices[index.x] == vertices[index.y] || vertices[index.x] == vertices[index.z] || vertices[index.y] == vertices[index.z])
+				face_normals.push_back(glm::vec3(0,1,0));
+			else
+			{
+				face_normal = glm::normalize(glm::cross(vertices[index.y] - vertices[index.x], vertices[index.z] - vertices[index.x]));
+				//face_normal = glm::normalize((normals[index.x] + normals[index.y] + normals[index.z]) / 3.0f);
+				face_normals.push_back(face_normal);
+			}
 		}
 	}
 	temp_normals.clear();
@@ -101,8 +108,10 @@ int Mesh::writeOBJ(const char* file)
 
 void Mesh::draw(const VBO& vbos)
 {
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// set color
-	setColor(glm::vec3(0.4, 0.9, 0.8));
+	setColor(glm::vec3(0.6, 0.9, 0.8));
 
 	// vertices
 	glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
@@ -171,17 +180,17 @@ bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::
 		if(P1 == P2 || P1 == P3 || P2 == P3)
 			continue;
 
-		//glm::vec3 face_normal = -face_normals[i];
-		glm::vec3 face_normal = glm::normalize(glm::cross(P2 - P1, P3 - P1));
-		if(glm::dot(face_normal, dir) < 0)
-			face_normal = -face_normal;
+		glm::vec3 face_normal = -face_normals[i];
+		//glm::vec3 face_normal = glm::normalize(glm::cross(P2 - P1, P3 - P1));
+		//if(glm::dot(face_normal, dir) < 0)
+			//face_normal = -face_normal;
 		float denominator = glm::dot(face_normal, dir);
 		if((denominator < EPSILON) && (denominator > -EPSILON))
 			continue;
 		else
 		{
 			t = glm::dot(face_normal, P1 - pos) / denominator;
-			if(t < 0 || t > 1)
+			if(t < EPSILON || t > 1)
 				continue;
 			else
 			{
