@@ -49,7 +49,7 @@ struct Cell{
 class SpaceGrid{
 	public:
 		void pushParticle(particle& pt, int frameID);
-		void getNeighbors(particle& pt);
+		void getNeighbors(particle& pt, int frameID);
 		glm::vec3 dim;
 
 	protected:
@@ -93,7 +93,7 @@ private:
 	void initSphere();
 	void initCube();
 	
-	void GenerateParticles();
+	void GenerateParticles(int numberX, int numberY, int numberZ);
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
 	bool checkIfOutOfBoundry(const particle& p);

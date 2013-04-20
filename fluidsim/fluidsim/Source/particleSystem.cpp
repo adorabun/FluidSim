@@ -11,7 +11,7 @@ int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
 float particleSystem::tension_coeff = 50.f;//sigma
-float particleSystem::surfaceThreshold = 0.8f;//l need to figure out value by printing
+float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
 
@@ -43,7 +43,7 @@ particle::particle(glm::vec3 position, float rho){
 		
 
 		viscosity_coef = 800.f;
-		gas_constant = 100.f;
+		gas_constant = 300.f;
 		
 		temperature = 500;
 
@@ -93,14 +93,36 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 				
 				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
 				p1.id = id;
-				//p1.vel.x = 5.f;
 				particles[id] = p1;
 
 			}
 
 }
 
-void particleSystem::GenerateParticles(){
+void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
+	float stepsize = 2.f * radius;
+	int total = numberX * numberY * numberZ;
+	
+	particles.resize(particles.size() + total);
+	
+	int id;
+
+	glm::vec3 offset1(0.f);
+	offset1.x = (particleSystem::xend - numberX * particleSystem::radius * 2.f) * 0.5f;
+	offset1.y = (particleSystem::yend - numberY * particleSystem::radius * 2.f) * 0.5f;
+	offset1.z = (particleSystem::zend - numberZ * particleSystem::radius * 2.f) * 0.5f;
+
+	for(int z = 0; z < numberZ; z++)
+		for(int y = 0; y < numberY; y++)
+			for(int x = 0; x < numberX; x++){
+				id = numberX*numberY*z + y*numberX+ x;
+				
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
+				p1.id = total + id;
+				p1.viscosity_coef = 1000.f;
+				particles.push_back(p1);
+
+			}
 
 }
 //void particleSystem::initParticles(int number){
@@ -311,13 +333,11 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	//double time1 = glfwGetTime();
 
 	
-
-	
 	//double time2= glfwGetTime();
 
 	//calculate actual density 
 	for (int i=0; i < target.size(); i++){
-		mygrid.getNeighbors(target[i]);
+		mygrid.getNeighbors(target[i], frameCount);
 			
 		computeDensity(target[i]);
 		
@@ -409,6 +429,7 @@ bool particleSystem::CollisionDectection(particle& p, glm::vec3& n){
 
 ///////////////////////////////smoothing kernels//////////////////////////////////////
 inline float poly6Kernel(glm::vec3 r, float h){
+	//std::cout << r.x <<", " <<r.y <<","<<r.z<<std::endl;
 	float rLen = glm::length(r);
 
 	if(rLen <= h){
@@ -548,7 +569,9 @@ void particleSystem::computeDensity(particle& pi){
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
-	GenerateParticles();
+	//if(frameCount == 200)
+		//GenerateParticles(9, 30, 9);
+	//std::cout<<frameCount<<std::endl;
 	LeapfrogIntegrate(0.01f);
 	
 	
@@ -557,10 +580,10 @@ void particleSystem::Draw(const VBO& vbos){
 
 		for(int i=0; i< m_positions.size(); i++){
 				m_positions[i] += (particles[id].pos);
-				//if(id> particles.size() * 0.5)
+				if(id < 2430)
 					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);//blue
-				//else
-					//m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil
+				else
+					m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil
 		}
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
@@ -706,7 +729,7 @@ void SpaceGrid::pushParticle(particle& pt, int frameID){
 	mymap[index].ps.push_back(&pt);
 
 }
-void SpaceGrid::getNeighbors(particle& pt){
+void SpaceGrid::getNeighbors(particle& pt, int frameID){
 	
 
 	std::vector<particle*> temp;
@@ -722,8 +745,7 @@ void SpaceGrid::getNeighbors(particle& pt){
 				
 				vecIndex = gridIndexToVecIndex(currGridIndex);
 				
-				
-				if( mymap.find(vecIndex) != mymap.end() )//sanity check
+				if( mymap.find(vecIndex) != mymap.end() && mymap[vecIndex].frameID == frameID)//sanity check
 					temp.insert(temp.end(), mymap[vecIndex].ps.begin(), mymap[vecIndex].ps.end() );
 					
 			}

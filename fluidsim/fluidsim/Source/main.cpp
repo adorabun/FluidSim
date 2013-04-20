@@ -323,7 +323,8 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 
 	//particleSystem ps(16);//16^3=4096
-	particleSystem ps(9, 30, 9);//1728
+	//particleSystem ps(9, 30, 9);//1728
+	particleSystem ps(5, 5, 5);
 
     lastTime = glfwGetTime();
     while(run)
@@ -354,7 +355,7 @@ int main(int argc, char** argv)
 
         now = glfwGetTime();
         char fpsInfo[256];
-        sprintf(fpsInfo, "%f", 1.0f / (now - lastTime));
+		sprintf(fpsInfo, "FPS: %f FrameID: %d", 1.0f / (now - lastTime), ps.frameCount);
         lastTime = now;
         glfwSetWindowTitle(fpsInfo);
 
