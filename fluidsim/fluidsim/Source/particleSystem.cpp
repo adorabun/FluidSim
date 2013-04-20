@@ -4,24 +4,25 @@
 #include <iostream>
 
 #define EPSILON 0.000001f
-#define SMOOTH_CORE_RADIUS 0.5f //three times the average distance
+#define SMOOTH_CORE_RADIUS 0.45f //three times the average distance
 
 
 int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
 float particleSystem::tension_coeff = 50.f;//sigma
-float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
+float particleSystem::surfaceThreshold = 0.8f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
+
 
 float particleSystem::ystart = 0.f;
 float particleSystem::zstart = 0.f;
 float particleSystem::xend = 4.0f;
-float particleSystem::yend = 10.0f;
+float particleSystem::yend = 15.0f;
 float particleSystem::zend = 4.0f;
 
-#define offset1 glm::vec3(0.1f, 2.f, 0.1f)
+//#define offset1 glm::vec3(0.5f, 2.f, 0.5f)
 #define offset2 glm::vec3(0.1f, 5.5f, 0.1f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
@@ -33,7 +34,7 @@ particle::particle(glm::vec3 position, float rho){
 		rest_density = rho;
 		actual_density = rest_density;
 
-		mass = rho * 1.333333f * M_PI * pow(particleSystem::radius,3);//27.f;//19.683f;=(width*radius*2)^3 * density/particle num
+		mass = rho * 1.333333f * M_PI * pow(particleSystem::radius,3);//=(width*radius*2)^3 * density/particle num
 		force = glm::vec3(0.f);
 
 		pos = position;
@@ -41,8 +42,8 @@ particle::particle(glm::vec3 position, float rho){
 
 		
 
-		viscosity_coef = 100.f;//10.f
-		gas_constant = 30.f;//3.f
+		viscosity_coef = 800.f;
+		gas_constant = 100.f;
 		
 		temperature = 500;
 
@@ -57,10 +58,10 @@ particleSystem::particleSystem(){
 
 }
 
-particleSystem::particleSystem(int number){
+particleSystem::particleSystem(int numberX, int numberY, int numberZ){
 	frameCount = 0;
 
-	initParticles(number);
+	initParticles(numberX, numberY, numberZ);
 	initSphere();
 	
 	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
@@ -71,12 +72,43 @@ particleSystem::particleSystem(int number){
 	mygrid.dim = glm::vec3(gx,gy,gz);
 }
 
+void particleSystem::initParticles(int numberX, int numberY, int numberZ){
+
+	float stepsize = 2.f * radius;
+	int total = numberX * numberY * numberZ;
+	
+	particles.resize(total);
+	
+	int id;
+
+	glm::vec3 offset1(0.f);
+	offset1.x = (particleSystem::xend - numberX * particleSystem::radius * 2.f) * 0.5f;
+	offset1.y = (particleSystem::yend - numberY * particleSystem::radius * 2.f) * 0.5f;
+	offset1.z = (particleSystem::zend - numberZ * particleSystem::radius * 2.f) * 0.5f;
+
+	for(int z = 0; z < numberZ; z++)
+		for(int y = 0; y < numberY; y++)
+			for(int x = 0; x < numberX; x++){
+				id = numberX*numberY*z + y*numberX+ x;
+				
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
+				p1.id = id;
+				//p1.vel.x = 5.f;
+				particles[id] = p1;
+
+			}
+
+}
+
+void particleSystem::GenerateParticles(){
+
+}
 //void particleSystem::initParticles(int number){
 //
 //	float stepsize = 2.f * radius;
 //	int total = number * number * number;
 //	
-//	particles.resize(total);
+//	particles.resize(total*2);
 //	
 //	int id;
 //
@@ -86,42 +118,18 @@ particleSystem::particleSystem(int number){
 //			for(int z = 0; z < number; z++){
 //				id = x*number*number + y*number + z;
 //				
-//				particle* p1 = new particle(glm::vec3(x, y, z) * stepsize + offset1);
-//				p1->id = id;
-//				p1->vel.y = -5.f;
+//				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
+//				p1.id = id;
 //				particles[id] = p1;
+//				
+//				id += total;
+//				particle p2(glm::vec3(x, y, z) * stepsize + offset2, 1000.f);
+//				p2.id = id;
+//				particles[id] = p2;
 //
 //			}
 //
 //}
-
-void particleSystem::initParticles(int number){
-
-	float stepsize = 2.f * radius;
-	int total = number * number * number;
-	
-	particles.resize(total*2);
-	
-	int id;
-
-
-	for(int x = 0; x < number; x++)
-		for(int y = 0; y < number; y++)
-			for(int z = 0; z < number; z++){
-				id = x*number*number + y*number + z;
-				
-				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
-				p1.id = id;
-				particles[id] = p1;
-				
-				id += total;
-				particle p2(glm::vec3(x, y, z) * stepsize + offset2, 1000.f);
-				p2.id = id;
-				particles[id] = p2;
-
-			}
-
-}
 
 
 void particleSystem::initSphere(){
@@ -303,15 +311,13 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	//double time1 = glfwGetTime();
 
 	
-	for (int i=0; i < target.size(); i++){
-		mygrid.getNeighbors(target[i]);
-	}
+
 	
 	//double time2= glfwGetTime();
 
 	//calculate actual density 
 	for (int i=0; i < target.size(); i++){
-		//mygrid.getNeighbors(target[i]);
+		mygrid.getNeighbors(target[i]);
 			
 		computeDensity(target[i]);
 		
@@ -542,6 +548,7 @@ void particleSystem::computeDensity(particle& pi){
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
+	GenerateParticles();
 	LeapfrogIntegrate(0.01f);
 	
 	
@@ -550,12 +557,10 @@ void particleSystem::Draw(const VBO& vbos){
 
 		for(int i=0; i< m_positions.size(); i++){
 				m_positions[i] += (particles[id].pos);
-				/*if(id==37)
-					m_colors[i] = glm::vec3(1.f,0,0);
-				else */if(id> particles.size() * 0.5)
+				//if(id> particles.size() * 0.5)
 					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);//blue
-				else
-					m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil
+				//else
+					//m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil
 		}
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
@@ -695,7 +700,7 @@ void SpaceGrid::pushParticle(particle& pt, int frameID){
 	if(mymap[index].frameID < frameID){
 		mymap[index].frameID = frameID;
 		mymap[index].ps.clear();
-		mymap[index].ps.reserve(64);
+		mymap[index].ps.reserve(128);
 	}
 	
 	mymap[index].ps.push_back(&pt);
@@ -725,7 +730,7 @@ void SpaceGrid::getNeighbors(particle& pt){
 
 	pt.ngbrs = temp;
 
-	//std::cout<<pt->ngbrs.size()<<std::endl;
+	//std::cout<<pt.ngbrs.size()<<std::endl;
 
 	/*bool containitself = false;
 	for(int i=0; i<temp.size(); i++){

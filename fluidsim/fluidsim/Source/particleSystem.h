@@ -67,7 +67,7 @@ class particleSystem
 {
 public:
 	particleSystem();
-	particleSystem(int number);
+	particleSystem(int numberX, int numberY, int numberZ);
 
 	int frameCount;
 	void Draw(const VBO& vbos);
@@ -89,10 +89,11 @@ public:
 	void outputCenter(int& i_frame, char* s_file);
 
 private:
-	void initParticles(int number);
+	void initParticles(int numberX, int numberY, int numberZ);
 	void initSphere();
 	void initCube();
 	
+	void GenerateParticles();
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
 	bool checkIfOutOfBoundry(const particle& p);
