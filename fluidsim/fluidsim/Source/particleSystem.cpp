@@ -20,7 +20,7 @@ float particleSystem::yend = 100.0f;
 float particleSystem::zend = 100.0f;
 
 #define offset1 glm::vec3(9.2f, 7.f, 3.3f)
-#define offset2 glm::vec3(4.0f, 4.5f, 2.8f)
+#define offset2 glm::vec3(4.0f, 5.4f, 2.35f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -38,8 +38,8 @@ particle::particle(glm::vec3 position, float rho){
 		vel = glm::vec3(0.0);
 
 		
-		viscosity_coef = 200.f;
-		gas_constant = 200.f;
+		viscosity_coef = 100.f;
+		gas_constant = 300.f;
 		
 		temperature = 500;
 
@@ -136,9 +136,9 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 				
 				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1500.f);
 				p1.id = id;
-				p1.vel = glm::vec3(-3.0f, 0.0f, 0);
-				p1.viscosity_coef = 3000.0f;
-				p1.gas_constant = 100.0f;
+				p1.vel = glm::vec3(-5.0f, 0.0f, 0);
+				p1.viscosity_coef = 3500.0f;
+				p1.gas_constant = 50.0f;
 				p1.color_interface = 0.5f;
 				//p1.vel.x = 5.f;
 				particles.push_back(p1);
@@ -608,7 +608,7 @@ void particleSystem::Draw(const VBO& vbos){
 
 		for(int i=0; i< m_positions.size(); i++){
 				m_positions[i] += (particles[id].pos);
-				if(id< 972)
+				if(id< 1728)
 					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);//blue
 				else
 					m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil

@@ -319,7 +319,7 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 	
 	//particleSystem ps(16);//16^3=4096
-	particleSystem ps(9, 12, 9);//1728
+	particleSystem ps(12, 12, 12);//1728
 
     lastTime = glfwGetTime();
     while(run)
