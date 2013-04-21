@@ -26,10 +26,12 @@ particle::particle(){
 
 	}
 
-particle::particle(glm::vec3 position, float rho){
+particle::particle(glm::vec3 position, float rho, float tem){
 
-		rest_density = rho;
-		actual_density = rest_density;
+		temperature = tem;
+		rest_density = rho * tem;//original copy rest_density = user defined alpha
+		actual_density = rho;
+		
 
 		mass = rho * 1.333333f * M_PI * pow(particleSystem::radius,3);//=(width*radius*2)^3 * density/particle num
 		force = glm::vec3(0.f);
@@ -39,8 +41,6 @@ particle::particle(glm::vec3 position, float rho){
 
 		viscosity_coef = 800.f;
 		gas_constant = 100.f;
-
-		temperature = 20.f;
 
 		color_surface = 1.f;
 		color_interface = -0.5f;//water-polar
@@ -109,7 +109,7 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 			for(int x = 0; x < numberX; x++){
 				id = numberX*numberY*z + y*numberX+ x;
 
-				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f, 20.f);
 				p1.id = id;
 				particles[id] = p1;
 
@@ -135,12 +135,11 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 			for(int x = 0; x < numberX; x++){
 				id = total + numberX*numberY*z + y*numberX+ x;
 
-				particle pt_oil(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
+				particle pt_oil(glm::vec3(x, y, z) * stepsize + offset1, 800.f, 20.f);
 				pt_oil.id = id;
 				pt_oil.viscosity_coef = 1000.f;
 				pt_oil.gas_constant = 100.f;
 				pt_oil.color_interface = 0.5f;
-				pt_oil.temperature = 100.f;
 				particles[id] = pt_oil;
 
 			}
@@ -359,7 +358,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	
 	for (int i=0; i < target.size(); i++){
-		//computeRestDensity(target[i], dt);//heat diffusion
+		computeRestDensity(target[i], dt);//heat diffusion
 		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 	}
 
@@ -609,7 +608,8 @@ void particleSystem::computeRestDensity(particle& pi, float dt){
 
 	pi.rest_density = particles[pi.id].rest_density / particles[pi.id].temperature; //orginal copy stores the rest_density which is our alpha
 
-	std::cout << particles[pi.id].temperature <<std::endl;
+	assert(pi.rest_density > 0);	
+	//std::cout << particles[pi.id].temperature <<std::endl;
 }
 
 ///////////////////////////////draw related//////////////////////////////////////

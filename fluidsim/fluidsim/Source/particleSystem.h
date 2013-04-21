@@ -15,10 +15,10 @@ class particle{
 public:
 	particle();
 
-	particle(glm::vec3 position, float rho);
+	particle(glm::vec3 position, float rho, float tem);
 
 	int id;
-	float mass;//kg
+	float mass;//kg???
 
 	glm::vec3 pos;
 	glm::vec3 vel;//m/s
