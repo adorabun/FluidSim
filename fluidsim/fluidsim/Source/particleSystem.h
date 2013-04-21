@@ -50,7 +50,7 @@ struct Cell{
 class SpaceGrid{
 	public:
 		void pushParticle(particle& pt, int frameID);
-		void getNeighbors(particle& pt);
+		void getNeighbors(particle& pt, int frameID);
 		glm::vec3 dim;
 
 	protected:
@@ -68,7 +68,7 @@ class particleSystem
 {
 public:
 	particleSystem();
-	particleSystem(int number);
+	particleSystem(int numberX, int numberY, int numberZ);
 
 	int frameCount;
 	void Draw(const VBO& vbos);
@@ -78,7 +78,8 @@ public:
 	static int nSlice;
 	static int nStack;
 	static float radius;
-	static float tension_coeff;//sigma
+	static float surface_tension_coeff;//sigma_s
+    static float interface_tension_coeff;//sigma_i
 	static float surfaceThreshold;//l
 	static float xstart;
 	static float ystart;
@@ -90,10 +91,11 @@ public:
 	void outputCenter(int& i_frame, char* s_file);
 
 private:
-	void initParticles(int number);
+	void initParticles(int numberX, int numberY, int numberZ);
 	void initSphere();
 	void initCube();
 	
+	void GenerateParticles(int numberX, int numberY, int numberZ);
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
 	bool checkIfOutOfBoundry(const particle& p);

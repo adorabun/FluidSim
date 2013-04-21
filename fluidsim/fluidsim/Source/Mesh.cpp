@@ -88,7 +88,10 @@ int Mesh::readOBJ(const char* file)
 			normals[index.z] = temp_normals[normal_index.z];
 			// calculate face normals
 			if(vertices[index.x] == vertices[index.y] || vertices[index.x] == vertices[index.z] || vertices[index.y] == vertices[index.z])
-				face_normals.push_back(glm::vec3(0,1,0));
+			{
+				face_normal = glm::normalize((normals[index.x] + normals[index.y] + normals[index.z]) / 3.0f);
+				face_normals.push_back(face_normal);
+			}
 			else
 			{
 				face_normal = glm::normalize(glm::cross(vertices[index.y] - vertices[index.x], vertices[index.z] - vertices[index.x]));
@@ -182,15 +185,15 @@ bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::
 
 		glm::vec3 face_normal = -face_normals[i];
 		//glm::vec3 face_normal = glm::normalize(glm::cross(P2 - P1, P3 - P1));
-		//if(glm::dot(face_normal, dir) < 0)
-			//face_normal = -face_normal;
+		if(glm::dot(face_normal, dir) < 0)
+			face_normal = -face_normal;
 		float denominator = glm::dot(face_normal, dir);
 		if((denominator < EPSILON) && (denominator > -EPSILON))
 			continue;
 		else
 		{
 			t = glm::dot(face_normal, P1 - pos) / denominator;
-			if(t < EPSILON || t > 1)
+			if(t < EPSILON || t > 1.5)
 				continue;
 			else
 			{

@@ -26,9 +26,9 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 15.f;
-float head = 25.f, pitch = 55.f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 3.0f, 0.0f);
+float eye_distance = 13.f;
+float head = 20.f, pitch = -90.f;
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(8.0f, 5.0f, 2.0f);
 
 //----------functions----------//
 // declare
@@ -319,7 +319,7 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 	
 	//particleSystem ps(16);//16^3=4096
-	particleSystem ps(6);//1728
+	particleSystem ps(9, 12, 9);//1728
 
     lastTime = glfwGetTime();
     while(run)
@@ -349,7 +349,7 @@ int main(int argc, char** argv)
 
         now = glfwGetTime();
         char fpsInfo[256];
-        sprintf(fpsInfo, "%f", 1.0f / (now - lastTime));
+        sprintf(fpsInfo, "FPS: %f FrameID: %d", 1.0f / (now - lastTime), ps.frameCount);
         lastTime = now;
         glfwSetWindowTitle(fpsInfo);
 
