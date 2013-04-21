@@ -2,7 +2,6 @@
 #include "openGL_headers.h"
 #include "math_headers.h"
 #include "particleSystem.h"
-#include "OBJLoader.h"
 #include "stb_image_write.h"
 
 int window_width = 1024;
@@ -27,9 +26,9 @@ GLuint m_uniform_location[2];
 GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
-float eye_distance = 12.f;
-float head = 0.f, pitch = 90.f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(2.0f, 4.0f, 0.0f);
+float eye_distance = 9.5f;
+float head = 22.f, pitch = 65.f;
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(1.0f, 1.0f, 0.0f);
 
 //----------functions----------//
 // declare
@@ -250,7 +249,7 @@ void grabScreen(const particleSystem& ps)
     }
 
     char anim_filename[2048];
-    sprintf_s(anim_filename, 2048, "output/sph.png", frame_num);
+    sprintf_s(anim_filename, 2048, "output/sph%04d.png", frame_num);
 
     stbi_write_png(anim_filename, window_width, window_height, 3, bitmapData, window_width * 3);
 
@@ -315,7 +314,7 @@ int main(int argc, char** argv)
     glfwSetMouseButtonCallback(mouseClick);
     glfwSetMousePosCallback(mouseMotion);
 
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glViewport(0, 0, window_width, window_height);
@@ -323,7 +322,7 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 
 	//particleSystem ps(16);//16^3=4096
-	particleSystem ps(9, 30, 9);//1728
+	particleSystem ps(9, 30, 9);//2430
 	//particleSystem ps(5, 5, 5);
 
     lastTime = glfwGetTime();
@@ -344,7 +343,7 @@ int main(int argc, char** argv)
 		
 		
 		ps.Draw(vbo_handle);
-		ps.drawWireGrid();
+		//ps.drawWireGrid();
 
         deactivate_shaderprog(m_shaderprog_handle);
 

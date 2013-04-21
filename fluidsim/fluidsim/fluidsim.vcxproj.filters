@@ -27,7 +27,7 @@
     <ClCompile Include="Source\stb_image.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\OBJLoader.cpp">
+    <ClCompile Include="Source\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,10 +47,10 @@
     <ClInclude Include="Source\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\OBJLoader.h">
+    <ClInclude Include="SpaceGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpaceGrid.h">
+    <ClInclude Include="Source\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

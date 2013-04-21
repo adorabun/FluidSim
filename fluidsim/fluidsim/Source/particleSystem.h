@@ -7,6 +7,7 @@
 
 #include "openGL_headers.h"
 #include "math_headers.h"
+#include "Mesh.h"
 
 #define M_PI 3.1415926
 
@@ -18,11 +19,11 @@ public:
 
 	int id;
 	float mass;
-	
+
 	glm::vec3 pos;
 	glm::vec3 vel;
 	glm::vec3 force;
-	 
+
 	float rest_density;
 	float actual_density;
 
@@ -30,7 +31,6 @@ public:
 	float gas_constant;//k
 
 	float temperature;
-	float temperature_next;
 
 	float color_interface;//Ci
 	float color_surface;//Cs
@@ -38,7 +38,7 @@ public:
 	float pressure;
 
 	std::vector<particle*> ngbrs;
-	
+
 };
 
 struct Cell{
@@ -54,12 +54,12 @@ class SpaceGrid{
 		glm::vec3 dim;
 
 	protected:
-		
+
 		glm::vec3 positionToGridIndex(glm::vec3 p);
 		int gridIndexToVecIndex(glm::vec3 index);
 		int positionToVecIndex(glm::vec3 p);
 		bool IfWithinBoundry(glm::vec3 gridIndex);
-		
+
 		std::map<int, Cell> mymap;
 
 };
@@ -79,9 +79,8 @@ public:
 	static int nStack;
 	static float radius;
 	static float surface_tension_coeff;//sigma_s
-	static float interface_tension_coeff;//sigma_i
+    static float interface_tension_coeff;//sigma_i
 	static float surfaceThreshold;//l
-	
 	static float xstart;
 	static float ystart;
 	static float zstart;
@@ -95,14 +94,12 @@ private:
 	void initParticles(int numberX, int numberY, int numberZ);
 	void initSphere();
 	void initCube();
-	
+
 	void GenerateParticles(int numberX, int numberY, int numberZ);
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
-	//void computeTemperature(particle& pi, float dt);
 	bool checkIfOutOfBoundry(const particle& p);
 	bool CollisionDectection(particle& p, glm::vec3& n);
-
 private:
 	std::vector<particle> particles;
 
@@ -114,8 +111,7 @@ private:
 	std::vector<glm::vec3> m_colors;
 	std::vector<unsigned short> m_indices;
 
-	
+	Mesh* container;
 };
 
 #endif
-

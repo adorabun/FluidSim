@@ -3,12 +3,10 @@
 #include <fstream>
 #include <iostream>
 
-#define EPSILON 0.000001f
 #define SMOOTH_CORE_RADIUS 0.45f //three times the average distance
 
-
-int particleSystem::nSlice = 6;
-int particleSystem::nStack = 6;
+int particleSystem::nSlice = 8;
+int particleSystem::nStack = 8;
 float particleSystem::radius = 0.15f;
 float particleSystem::surface_tension_coeff = 50.f;//sigma_s
 float particleSystem::interface_tension_coeff = 50.f;//sigma_i
@@ -21,15 +19,15 @@ float particleSystem::xend = 4.0f;
 float particleSystem::yend = 15.0f;
 float particleSystem::zend = 4.0f;
 
-//#define offset1 glm::vec3(0.5f, 2.f, 0.5f)
-#define offset2 glm::vec3(0.1f, 5.5f, 0.1f)
+
+#define offset2 glm::vec3(4.0f, 5.4f, 2.35f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
 	}
 
 particle::particle(glm::vec3 position, float rho){
-		
+
 		rest_density = rho;
 		actual_density = rest_density;
 
@@ -41,14 +39,12 @@ particle::particle(glm::vec3 position, float rho){
 
 		viscosity_coef = 800.f;
 		gas_constant = 300.f;
-		
+
 		temperature = 20.f;
-		temperature_next = 0.f;
+		//temperature_next = 0.f;
 
 		color_surface = 1.f;
 		color_interface = -0.5f;//water-polar
-		
-
 	}
 
 
@@ -58,11 +54,12 @@ particleSystem::particleSystem(){
 }
 
 particleSystem::particleSystem(int numberX, int numberY, int numberZ){
+
 	frameCount = 0;
 
 	initParticles(numberX, numberY, numberZ);
 	initSphere();
-	
+
 	int gx = floor(xend/SMOOTH_CORE_RADIUS) + 1;
 	int gy = floor(yend/SMOOTH_CORE_RADIUS) + 1;
 	int gz = floor(zend/SMOOTH_CORE_RADIUS) + 1;
@@ -70,14 +67,37 @@ particleSystem::particleSystem(int numberX, int numberY, int numberZ){
 	//gridcells.resize(gx, gy, gz, particles);
 	mygrid.dim = glm::vec3(gx,gy,gz);
 }
+//void particleSystem::initParticles(int number){
+//
+//	float stepsize = 2.f * radius;
+//	int total = number * number * number;
+//	
+//	particles.resize(total);
+//	
+//	int id;
+//
+//
+//	for(int x = 0; x < number; x++)
+//		for(int y = 0; y < number; y++)
+//			for(int z = 0; z < number; z++){
+//				id = x*number*number + y*number + z;
+//				
+//				particle* p1 = new particle(glm::vec3(x, y, z) * stepsize + offset1);
+//				p1->id = id;
+//				p1->vel.y = -5.f;
+//				particles[id] = p1;
+//
+//			}
+//
+//}
 
 void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 
 	float stepsize = 2.f * radius;
 	int total = numberX * numberY * numberZ;
-	
+
 	particles.resize(total);
-	
+
 	int id;
 
 	glm::vec3 offset1(0.f);
@@ -89,7 +109,7 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 		for(int y = 0; y < numberY; y++)
 			for(int x = 0; x < numberX; x++){
 				id = numberX*numberY*z + y*numberX+ x;
-				
+
 				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
 				p1.id = id;
 				particles[id] = p1;
@@ -101,9 +121,9 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 	float stepsize = 2.f * radius;
 	int total = particles.size();
-	
+
 	particles.resize(total + numberX * numberY * numberZ);
-	
+
 	int id;
 
 	glm::vec3 offset1(0.f);
@@ -115,16 +135,16 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 		for(int y = 0; y < numberY; y++)
 			for(int x = 0; x < numberX; x++){
 				id = total + numberX*numberY*z + y*numberX+ x;
-				
+
 				particle pt_oil(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
 				pt_oil.id = id;
 				pt_oil.viscosity_coef = 1000.f;
+				pt_oil.gas_constant = 100.f;
 				pt_oil.color_interface = 0.5f;
 				pt_oil.temperature = 100.f;
 				particles[id] = pt_oil;
 
 			}
-
 }
 //void particleSystem::initParticles(int number){
 //
@@ -153,7 +173,6 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 //			}
 //
 //}
-
 
 void particleSystem::initSphere(){
 
@@ -305,7 +324,7 @@ void particleSystem::initCube(){
 	m_indices[33]= 23;
 	m_indices[34]= 20;
 	m_indices[35]= 22;
-	
+
 }
 
 
@@ -402,7 +421,7 @@ bool particleSystem::CollisionDectection(particle& p, glm::vec3& n){
 		n.x = -1.f;
 		//p.pos.x = xend - EPSILON;
 	}
-	
+
 	if(pos.y < ystart){
 		n.y = 1.f;
 		//p.pos.y = ystart + EPSILON;
@@ -430,7 +449,6 @@ bool particleSystem::CollisionDectection(particle& p, glm::vec3& n){
 
 ///////////////////////////////smoothing kernels//////////////////////////////////////
 inline float poly6Kernel(glm::vec3 r, float h){
-	//std::cout << r.x <<", " <<r.y <<","<<r.z<<std::endl;
 	float rLen = glm::length(r);
 
 	if(rLen <= h){
@@ -447,7 +465,7 @@ inline glm::vec3 poly6KernelGradient(glm::vec3 r, float h){
 		float t =  - 945.f  * pow(h*h - rLen*rLen, 2) / (32.f * M_PI * pow(h,9) );
 		return t*r;
 	}
-		
+
 	return glm::vec3(0.f);
 
 }
@@ -457,7 +475,7 @@ inline float poly6KernelLaplacian(glm::vec3 r, float h){
 
 	if(rLen <= h)
 		return 945.f * (h*h - rLen*rLen) * (7.f*rLen*rLen - 3*h*h) / (32.f * M_PI * pow(h,9) );
-		
+
 	return 0.f;
 }
 
@@ -503,26 +521,25 @@ void particleSystem::computeForce(particle& pi){
 	glm::vec3 f_surfaceTension(0.f);
 	glm::vec3 f_interfaceTension(0.f);
 	glm::vec3 f_gravity = glm::vec3(0,-9.8f * 3,0) * pi.actual_density;
-	
+
 	float massOverDensity;
 	glm::vec3 r;
 
-	
+
 	glm::vec3 Cs_normal = glm::vec3(0.f);
 	glm::vec3 Ci_normal = glm::vec3(0.f);
 
 	float Cs_Laplacian = 0.f;
 	float Ci_Laplacian = 0.f;
 
-
 	for (int j=0; j< pi.ngbrs.size(); j++){
 		massOverDensity = pi.ngbrs[j]->mass / pi.ngbrs[j]->actual_density;
 
 		r = pi.pos - pi.ngbrs[j]->pos;
 
-		
+
 		f_pressure -=  massOverDensity * ( pi.pressure + pi.ngbrs[j]->pressure ) * 0.5f * spikyKernelGradient(r, SMOOTH_CORE_RADIUS);
-	
+
 		f_viscosity  += ( pi.viscosity_coef + pi.ngbrs[j]->viscosity_coef) * 0.5f *
 			massOverDensity * ( pi.ngbrs[j]->vel - pi.vel ) * viscosityKernelLaplacian(r, SMOOTH_CORE_RADIUS);
 
@@ -531,23 +548,23 @@ void particleSystem::computeForce(particle& pi){
 
 		Cs_Laplacian += massOverDensity * pi.ngbrs[j]->color_surface * poly6KernelLaplacian(r, SMOOTH_CORE_RADIUS);
 		Ci_Laplacian += massOverDensity * pi.ngbrs[j]->color_interface * poly6KernelLaplacian(r, SMOOTH_CORE_RADIUS);
-		
+    
+
 	}
 
 	float Cs_normal_len = glm::length(Cs_normal);
 	float Ci_normal_len = glm::length(Ci_normal);
-
 	float curvature_s;
 	if(Cs_normal_len > surfaceThreshold){
 		curvature_s =  - Cs_Laplacian / Cs_normal_len;
-		f_surfaceTension = surface_tension_coeff * curvature_s * Cs_normal;
+	    f_surfaceTension = surface_tension_coeff * curvature_s * Cs_normal;
 	}
 
 	float curvature_i =  - Ci_Laplacian / (Ci_normal_len + 0.000000001f);
 	f_interfaceTension = interface_tension_coeff * curvature_i * Cs_normal;
-	
+  
 	pi.force = f_pressure + f_viscosity + f_surfaceTension + f_interfaceTension + f_gravity;
-	
+ 
 }
 
 void particleSystem::computeDensity(particle& pi){
@@ -578,40 +595,18 @@ void particleSystem::computeDensity(particle& pi){
 
 	pi.actual_density = rho;
 
-	//std::cout << "framecount =" <<frameCount <<" id= "<<pi.id<<std::endl;
-
-	assert(rho > 0);		
+	assert(rho > 0);	
 }
-
-//void particleSystem::computeTemperature(particle& pi, float dt){
-//	
-//	//resrt
-//	
-//	float tem = 0.f;
-//	float c = 0.0001f;
-//
-//	//accumulate
-//	for (int j=0; j< pi.ngbrs.size(); j++)
-//	{
-//
-//		tem += pi.ngbrs[j]->mass * (pi.temperature - pi.ngbrs[j]->temperature) 
-//			* poly6KernelLaplacian(pi.pos - pi.ngbrs[j]->pos, SMOOTH_CORE_RADIUS) / pi.ngbrs[j]->actual_density;
-//	}
-//
-//	pi.temperature_next = pi.temperature + dt * c * tem;
-//
-//		
-//}
 
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
-	
-	if(frameCount > 200 && frameCount%12 == 0)
-		GenerateParticles(5, 5, 5);
-	
+
+	if(frameCount > 96 && frameCount <=240 && frameCount%48 == 0)
+		GenerateParticles(6, 6, 6);
+
 	LeapfrogIntegrate(0.01f);
-	
-	
+
+
 
 	for (int id=0; id<particles.size(); id++ ){
 
@@ -622,6 +617,8 @@ void particleSystem::Draw(const VBO& vbos){
 				else
 					m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		 // position
 		glBindBuffer(GL_ARRAY_BUFFER, vbos.m_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 3 * m_positions.size() * sizeof(float), &m_positions[0], GL_STREAM_DRAW);
@@ -661,11 +658,11 @@ void particleSystem::Draw(const VBO& vbos){
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		for(int i=0; i< m_positions.size(); i++){
-					m_positions[i] -= (particles[id].pos);
-					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);
+			m_positions[i] -= (particles[id].pos);
 		}
 
 	}
+	//container->draw(vbos);
 }
 
 
@@ -679,7 +676,7 @@ void particleSystem::drawWireGrid()
       glColor3f(0.25, 0.25, 0.25);
 
       glBegin(GL_LINES);
-	  
+
 	  glVertex3d(xstart, ystart, zstart);
 	  glVertex3d(xend, ystart, zstart);
 
@@ -750,7 +747,7 @@ void particleSystem::outputCenter(int& i_frame, char* s_file)
 
 
 void SpaceGrid::pushParticle(particle& pt, int frameID){
-	
+
 	int index = positionToVecIndex(pt.pos);
 
 	if(index == -1)
@@ -762,15 +759,15 @@ void SpaceGrid::pushParticle(particle& pt, int frameID){
 		mymap[index].ps.clear();
 		mymap[index].ps.reserve(128);
 	}
-	
+
 	mymap[index].ps.push_back(&pt);
 
 }
 void SpaceGrid::getNeighbors(particle& pt, int frameID){
-	
+
 
 	std::vector<particle*> temp;
-	
+
 	glm::vec3 gridIndex = positionToGridIndex(pt.pos);
 	glm::vec3 currGridIndex;
 	int vecIndex;
@@ -779,12 +776,13 @@ void SpaceGrid::getNeighbors(particle& pt, int frameID){
 		for(int y = -1; y <= 1; y++)
 			for(int z = -1; z <= 1; z++){
 				currGridIndex = gridIndex + glm::vec3(x,y,z);
-				
+
 				vecIndex = gridIndexToVecIndex(currGridIndex);
-				
+
+
 				if( mymap.find(vecIndex) != mymap.end() && mymap[vecIndex].frameID == frameID)//sanity check
 					temp.insert(temp.end(), mymap[vecIndex].ps.begin(), mymap[vecIndex].ps.end() );
-					
+
 			}
 
 	pt.ngbrs = temp;
@@ -827,7 +825,7 @@ glm::vec3 SpaceGrid::positionToGridIndex(glm::vec3 p){
 
 
 int SpaceGrid::gridIndexToVecIndex(glm::vec3 index){
-	
+
 	if( IfWithinBoundry( index) )
 		return dim.x * dim.y * index.z + dim.x * index.y + index.x;
 	else
@@ -847,6 +845,6 @@ bool SpaceGrid::IfWithinBoundry(glm::vec3 gridIndex){
 		return false;
 	if(gridIndex.z < 0 || gridIndex.z >= dim.z)
 		return false;
-	
+
 	return true;
 }
