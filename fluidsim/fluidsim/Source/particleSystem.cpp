@@ -10,8 +10,8 @@
 int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
-float particleSystem::surface_tension_coeff = 50.f;//sigma_s
-float particleSystem::interface_tension_coeff = 50.f;//sigma_i
+float particleSystem::surface_tension_coeff = 5.f;//sigma_s
+float particleSystem::interface_tension_coeff = 5.f;//sigma_i
 float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
@@ -38,8 +38,6 @@ particle::particle(glm::vec3 position, float rho){
 
 		pos = position;
 		vel = glm::vec3(0.0);
-
-		
 
 		viscosity_coef = 800.f;
 		gas_constant = 300.f;
@@ -116,14 +114,14 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 	for(int z = 0; z < numberZ; z++)
 		for(int y = 0; y < numberY; y++)
 			for(int x = 0; x < numberX; x++){
-				id = numberX*numberY*z + y*numberX+ x;
+				id = total + numberX*numberY*z + y*numberX+ x;
 				
 				particle pt_oil(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
-				pt_oil.id = total + id;
+				pt_oil.id = id;
 				pt_oil.viscosity_coef = 1000.f;
 				pt_oil.color_interface = 0.5f;
 				pt_oil.temperature = 100.f;
-				particles.push_back(pt_oil);
+				particles[id] = pt_oil;
 
 			}
 
@@ -608,7 +606,7 @@ void particleSystem::computeDensity(particle& pi){
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
-	if(frameCount == 200)
+	if(frameCount == 25)
 		GenerateParticles(5, 5, 5);
 	
 	LeapfrogIntegrate(0.01f);
