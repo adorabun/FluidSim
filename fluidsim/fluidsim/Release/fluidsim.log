@@ -1,4 +1,8 @@
-﻿Build started 4/20/2013 10:05:01 PM.
+﻿Build started 4/20/2013 10:47:54 PM.
+     1>Project "E:\PBA2\final\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" on node 2 (clean target(s)).
+     1>_PrepareForClean:
+         Deleting file "Release\fluidsim.lastbuildstate".
+     1>Done Building Project "E:\PBA2\final\fluidsim\fluidsim\fluidsim\fluidsim.vcxproj" (clean target(s)).
 
 Build succeeded.
 

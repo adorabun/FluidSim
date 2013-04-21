@@ -19,8 +19,8 @@ float particleSystem::xend = 100.0f;
 float particleSystem::yend = 100.0f;
 float particleSystem::zend = 100.0f;
 
-#define offset1 glm::vec3(9.2f, 7.f, 3.3f)
-#define offset2 glm::vec3(4.0f, 5.4f, 2.35f)
+#define offset1 glm::vec3(4.0f, 5.4f, 2.35f)
+#define offset2 glm::vec3(9.2f, 7.f, 3.3f)
 /////////////////////Particle///////////////////////////////////
 particle::particle(){
 
@@ -114,7 +114,7 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 			for(int x = 0; x < numberX; x++){
 				id = numberX*numberY*z + y*numberX+ x;
 				
-				particle p1(glm::vec3(x, y, z) * stepsize + offset2, 1000.f);
+				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
 				p1.id = id;
 				//p1.vel.y = -5.f;
 				particles[id] = p1;
@@ -127,14 +127,14 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 	int id;
 	int current_count = particles.size();
 	float stepsize = 1.5f * radius;
-	if(frameCount % 3 == 0 && frameCount > 24 && frameCount < 150)
+	if(frameCount % 3 == 0 && frameCount > 47 && frameCount < 172)
 	{
 		for(int z = 0; z < numberZ; z++)
 		for(int y = 0; y < numberY; y++)
 		for(int x = 0; x < numberX; x++){
 				id = numberX*numberY*z + y*numberX+ x + current_count;
 				
-				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1500.f);
+				particle p1(glm::vec3(x, y, z) * stepsize + offset2, 1500.f);
 				p1.id = id;
 				p1.vel = glm::vec3(-5.0f, 0.0f, 0);
 				p1.viscosity_coef = 3500.0f;
@@ -143,8 +143,22 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 				//p1.vel.x = 5.f;
 				particles.push_back(p1);
 
-			}
+		}
 	}
+	//current_count = particles.size();
+	//if(frameCount == 151)
+	//{
+	//	for(int z = 0; z < numberZ; z++)
+	//	for(int y = 0; y < numberY; y++)
+	//	for(int x = 0; x < numberX; x++){
+	//		id = numberX*numberY*z + y*numberX+ x + current_count;
+	//			
+	//		particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f);
+	//		p1.id = id;
+	//		particles[id] = p1;
+
+	//	}
+	//}
 }
 //void particleSystem::initParticles(int number){
 //
