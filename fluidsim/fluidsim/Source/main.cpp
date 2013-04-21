@@ -249,7 +249,7 @@ void grabScreen(const particleSystem& ps)
     }
 
     char anim_filename[2048];
-    sprintf_s(anim_filename, 2048, "output/sph%04d.png", frame_num);
+    sprintf_s(anim_filename, 2048, "../output/sph%04d.png", frame_num);
 
     stbi_write_png(anim_filename, window_width, window_height, 3, bitmapData, window_width * 3);
 
