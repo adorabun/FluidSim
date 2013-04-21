@@ -30,6 +30,7 @@ public:
 	float gas_constant;//k
 
 	float temperature;
+	float temperature_next;
 
 	float color_interface;//Ci
 	float color_surface;//Cs
@@ -77,8 +78,10 @@ public:
 	static int nSlice;
 	static int nStack;
 	static float radius;
-	static float tension_coeff;//sigma
+	static float surface_tension_coeff;//sigma_s
+	static float interface_tension_coeff;//sigma_i
 	static float surfaceThreshold;//l
+	
 	static float xstart;
 	static float ystart;
 	static float zstart;
@@ -96,6 +99,7 @@ private:
 	void GenerateParticles(int numberX, int numberY, int numberZ);
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
+	//void computeTemperature(particle& pi, float dt);
 	bool checkIfOutOfBoundry(const particle& p);
 	bool CollisionDectection(particle& p, glm::vec3& n);
 

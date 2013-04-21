@@ -10,12 +10,11 @@
 int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
-float particleSystem::tension_coeff = 50.f;//sigma
+float particleSystem::surface_tension_coeff = 50.f;//sigma_s
+float particleSystem::interface_tension_coeff = 50.f;//sigma_i
 float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
-
-
 float particleSystem::ystart = 0.f;
 float particleSystem::zstart = 0.f;
 float particleSystem::xend = 4.0f;
@@ -45,10 +44,12 @@ particle::particle(glm::vec3 position, float rho){
 		viscosity_coef = 800.f;
 		gas_constant = 300.f;
 		
-		temperature = 500;
+		temperature = 20.f;
+		temperature_next = 0.f;
 
-		color_interface = 1.f;
 		color_surface = 1.f;
+		color_interface = -0.5f;//water-polar
+		
 
 	}
 
@@ -117,10 +118,12 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 			for(int x = 0; x < numberX; x++){
 				id = numberX*numberY*z + y*numberX+ x;
 				
-				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
-				p1.id = total + id;
-				p1.viscosity_coef = 1000.f;
-				particles.push_back(p1);
+				particle pt_oil(glm::vec3(x, y, z) * stepsize + offset1, 800.f);
+				pt_oil.id = total + id;
+				pt_oil.viscosity_coef = 1000.f;
+				pt_oil.color_interface = 0.5f;
+				pt_oil.temperature = 100.f;
+				particles.push_back(pt_oil);
 
 			}
 
@@ -314,7 +317,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	std::vector<particle>& source = particles;//source is a ptr!
 	glm::vec3 collision_normal = glm::vec3(0.f);
 
-	
+
 	//double time0 = glfwGetTime();
 	for (int i=0; i < target.size(); i++){
 		target[i].pos = source[i].pos + source[i].vel * dt 
@@ -332,23 +335,23 @@ void particleSystem::LeapfrogIntegrate(float dt){
 
 	//double time1 = glfwGetTime();
 
-	
+
 	//double time2= glfwGetTime();
 
 	//calculate actual density 
 	for (int i=0; i < target.size(); i++){
 		mygrid.getNeighbors(target[i], frameCount);
-			
+
 		computeDensity(target[i]);
-		
+
 
 		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 	}
 
-	
+
 	//double time3= glfwGetTime();
 	for (int i=0; i < target.size(); i++){
-		
+
 		computeForce(target[i]);	
 	}
 	//double time4= glfwGetTime();
@@ -363,7 +366,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		computeForce(target, target[i]);
 	}*/
 
-	
+
 	for (int i=0; i < target.size(); i++){
 		source[i].pos = target[i].pos;
 		source[i].vel = target[i].vel + halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
@@ -500,6 +503,7 @@ void particleSystem::computeForce(particle& pi){
 	glm::vec3 f_pressure(0.f);
 	glm::vec3 f_viscosity(0.f);
 	glm::vec3 f_surfaceTension(0.f);
+	glm::vec3 f_interfaceTension(0.f);
 	glm::vec3 f_gravity = glm::vec3(0,-9.8f * 3,0) * pi.actual_density;
 	
 	float massOverDensity;
@@ -507,7 +511,11 @@ void particleSystem::computeForce(particle& pi){
 
 	
 	glm::vec3 Cs_normal = glm::vec3(0.f);
+	glm::vec3 Ci_normal = glm::vec3(0.f);
+
 	float Cs_Laplacian = 0.f;
+	float Ci_Laplacian = 0.f;
+
 
 	for (int j=0; j< pi.ngbrs.size(); j++){
 		massOverDensity = pi.ngbrs[j]->mass / pi.ngbrs[j]->actual_density;
@@ -516,27 +524,36 @@ void particleSystem::computeForce(particle& pi){
 
 		
 		f_pressure -=  massOverDensity * ( pi.pressure + pi.ngbrs[j]->pressure ) * 0.5f * spikyKernelGradient(r, SMOOTH_CORE_RADIUS);
-
+	
 		f_viscosity  += ( pi.viscosity_coef + pi.ngbrs[j]->viscosity_coef) * 0.5f *
 			massOverDensity * ( pi.ngbrs[j]->vel - pi.vel ) * viscosityKernelLaplacian(r, SMOOTH_CORE_RADIUS);
 
-		Cs_normal += massOverDensity * poly6KernelGradient(r, SMOOTH_CORE_RADIUS);
-		Cs_Laplacian += massOverDensity * poly6KernelLaplacian(r, SMOOTH_CORE_RADIUS);
+		Cs_normal += massOverDensity * pi.ngbrs[j]->color_surface * poly6KernelGradient(r, SMOOTH_CORE_RADIUS);
+		Ci_normal += massOverDensity * pi.ngbrs[j]->color_interface * poly6KernelGradient(r, SMOOTH_CORE_RADIUS);
+
+		Cs_Laplacian += massOverDensity * pi.ngbrs[j]->color_surface * poly6KernelLaplacian(r, SMOOTH_CORE_RADIUS);
+		Ci_Laplacian += massOverDensity * pi.ngbrs[j]->color_interface * poly6KernelLaplacian(r, SMOOTH_CORE_RADIUS);
 		
 	}
 
 	float Cs_normal_len = glm::length(Cs_normal);
+	float Ci_normal_len = glm::length(Ci_normal);
+
+	float curvature_s;
 	if(Cs_normal_len > surfaceThreshold){
-		float curvature =  - Cs_Laplacian / Cs_normal_len;
-		f_surfaceTension = tension_coeff * curvature * Cs_normal;
+		curvature_s =  - Cs_Laplacian / Cs_normal_len;
+		f_surfaceTension = surface_tension_coeff * curvature_s * Cs_normal;
 	}
+
+	float curvature_i =  - Ci_Laplacian / (Ci_normal_len + 0.000000001f);
+	f_interfaceTension = interface_tension_coeff * curvature_i * Cs_normal;
 	
-	pi.force = f_pressure + f_viscosity + f_surfaceTension + f_gravity;
-	//pi.force = f_pressure +  f_gravity;
+	pi.force = f_pressure + f_viscosity + f_surfaceTension + f_interfaceTension + f_gravity;
+	
 }
 
 void particleSystem::computeDensity(particle& pi){
-	
+
 	//resrt
 	float rho = 0.f;
 
@@ -560,18 +577,40 @@ void particleSystem::computeDensity(particle& pi){
 	//				<<" kernel= " << poly6Kernel(pi->pos - pi->ngbrs[j]->pos, SMOOTH_CORE_RADIUS)<<std::endl;
 
 	//}
-	
+
 	pi.actual_density = rho;
 
-	assert(rho > 0);	
+	//std::cout << "framecount =" <<frameCount <<" id= "<<pi.id<<std::endl;
+
+	assert(rho > 0);		
 }
+
+//void particleSystem::computeTemperature(particle& pi, float dt){
+//	
+//	//resrt
+//	
+//	float tem = 0.f;
+//	float c = 0.0001f;
+//
+//	//accumulate
+//	for (int j=0; j< pi.ngbrs.size(); j++)
+//	{
+//
+//		tem += pi.ngbrs[j]->mass * (pi.temperature - pi.ngbrs[j]->temperature) 
+//			* poly6KernelLaplacian(pi.pos - pi.ngbrs[j]->pos, SMOOTH_CORE_RADIUS) / pi.ngbrs[j]->actual_density;
+//	}
+//
+//	pi.temperature_next = pi.temperature + dt * c * tem;
+//
+//		
+//}
 
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
-	//if(frameCount == 200)
-		//GenerateParticles(9, 30, 9);
-	//std::cout<<frameCount<<std::endl;
+	if(frameCount == 200)
+		GenerateParticles(5, 5, 5);
+	
 	LeapfrogIntegrate(0.01f);
 	
 	
