@@ -14,7 +14,7 @@ out vec4 f_light;
 
 void main()
 {
-    f_color = vec4(v_color, 0.5);
+    f_color = vec4(v_color, 0.3);
     f_normal = transpose(inverse(u_modelviewMatrix)) * vec4(v_normal, 0.0);
     f_light = vec4(0.0, 0.0, 1.0, 0.0);
 

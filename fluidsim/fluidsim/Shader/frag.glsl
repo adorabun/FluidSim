@@ -12,5 +12,6 @@ void main()
     float diffuseTerm = clamp(abs(dot(f_normal, f_light)), 0.0, 1.0);
 
     out_Color = diffuseTerm * diffuseColor;
+	
 
 }

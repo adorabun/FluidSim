@@ -38,10 +38,9 @@ particle::particle(glm::vec3 position, float rho){
 		vel = glm::vec3(0.0);
 
 		viscosity_coef = 800.f;
-		gas_constant = 300.f;
+		gas_constant = 100.f;
 
 		temperature = 20.f;
-		//temperature_next = 0.f;
 
 		color_surface = 1.f;
 		color_interface = -0.5f;//water-polar
@@ -93,7 +92,7 @@ particleSystem::particleSystem(int numberX, int numberY, int numberZ){
 
 void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 
-	float stepsize = 2.f * radius;
+	float stepsize = 1.5f * radius;
 	int total = numberX * numberY * numberZ;
 
 	particles.resize(total);
@@ -351,17 +350,16 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 
 	//double time1 = glfwGetTime();
-
+	for (int i=0; i < target.size(); i++){
+		mygrid.getNeighbors(target[i], frameCount);
+		computeDensity(target[i]);//calculate actual density, not in the same loop as computeRestDensity b/c it uses actual density
+	}
 
 	//double time2= glfwGetTime();
 
-	//calculate actual density 
+	
 	for (int i=0; i < target.size(); i++){
-		mygrid.getNeighbors(target[i], frameCount);
-
-		computeDensity(target[i]);
-
-
+		//computeRestDensity(target[i], dt);//heat diffusion
 		target[i].pressure = target[i].gas_constant * (target[i].actual_density - target[i].rest_density);
 	}
 
@@ -373,15 +371,6 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	}
 	//double time4= glfwGetTime();
 
-	//calculate actual density 
-	/*for (int i=0; i < target.size(); i++){
-		computeDensity(target, target[i]);
-		target[i]->pressure = target[i]->gas_constant * (target[i]->actual_density - target[i]->rest_density);
-	}
-
-	for (int i=0; i < target.size(); i++){
-		computeForce(target, target[i]);
-	}*/
 
 
 	for (int i=0; i < target.size(); i++){
@@ -396,7 +385,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	/*std::cout<<"============"<<frameCount<<std::endl
 			 << "push   Particle = 2-1=" << time1-time0<<std::endl
 			 << "get    Neighbor = 2-1=" << time2-time1<<std::endl
-			 << "compute Density = 3-2=" << time3-time2<<std::endl
+			 << "compute Pressur = 3-2=" << time3-time2<<std::endl
 			 << "compute   Force = 4-3=" << time4-time3<<std::endl
 			 << "copy       back = 5-4=" << time5-time4<<std::endl;*/
 	frameCount++;
@@ -598,10 +587,38 @@ void particleSystem::computeDensity(particle& pi){
 	assert(rho > 0);	
 }
 
+void particleSystem::computeRestDensity(particle& pi, float dt){
+
+	//resrt
+	float tem = 0.f;
+	float c = 0.01f;
+
+	bool containself = false;
+	//accumulate
+	for (int j=0; j< pi.ngbrs.size(); j++)
+	{
+		if(pi.ngbrs[j]->id == pi.id)
+			containself = true;
+		tem  += pi.ngbrs[j]->mass * (pi.ngbrs[j]->temperature - pi.temperature) *
+			poly6KernelLaplacian(pi.pos - pi.ngbrs[j]->pos, SMOOTH_CORE_RADIUS) / pi.ngbrs[j]->actual_density;
+	}
+
+	tem *= c;
+
+	particles[pi.id].temperature += dt * tem;//euler integration
+
+	pi.rest_density = particles[pi.id].rest_density / particles[pi.id].temperature; //orginal copy stores the rest_density which is our alpha
+
+	std::cout << particles[pi.id].temperature <<std::endl;
+}
+
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 
-	if(frameCount > 96 && frameCount <=240 && frameCount%48 == 0)
+	//if(frameCount > 96 && frameCount <=240 && frameCount%48 == 0)
+		//GenerateParticles(6, 6, 6);
+
+	if(frameCount == 72)
 		GenerateParticles(6, 6, 6);
 
 	LeapfrogIntegrate(0.01f);
@@ -612,7 +629,7 @@ void particleSystem::Draw(const VBO& vbos){
 
 		for(int i=0; i< m_positions.size(); i++){
 				m_positions[i] += (particles[id].pos);
-				if(id < 2430)
+				if(id < 216)//2430
 					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);//blue
 				else
 					m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil

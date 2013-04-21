@@ -18,19 +18,19 @@ public:
 	particle(glm::vec3 position, float rho);
 
 	int id;
-	float mass;
+	float mass;//kg
 
 	glm::vec3 pos;
-	glm::vec3 vel;
-	glm::vec3 force;
+	glm::vec3 vel;//m/s
+	glm::vec3 force;//N/m^3
 
-	float rest_density;
+	float rest_density;//kg/m^3
 	float actual_density;
 
 	float viscosity_coef;//mu
-	float gas_constant;//k
+	float gas_constant;//k(stiffness)
 
-	float temperature;
+	float temperature;//celsius
 
 	float color_interface;//Ci
 	float color_surface;//Cs
@@ -98,6 +98,7 @@ private:
 	void GenerateParticles(int numberX, int numberY, int numberZ);
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
+	void computeRestDensity(particle& pi, float dt);
 	bool checkIfOutOfBoundry(const particle& p);
 	bool CollisionDectection(particle& p, glm::vec3& n);
 private:
