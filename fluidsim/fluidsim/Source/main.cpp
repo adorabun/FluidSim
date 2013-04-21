@@ -5,12 +5,13 @@
 #include "stb_image_write.h"
 
 int window_width = 1024;
-int window_height = 768;
+int window_height = 720;
 
 //----------State Control----------//
 bool pause = false;
 bool record = false;
-bool flip_draw_mode = false;
+bool drawgrid = true;
+
 
 //----------Time----------//
 double now, lastTime;
@@ -162,14 +163,14 @@ void keypress(int key, int action)
         case GLFW_KEY_SPACE:
             pause = !pause;
             break;
-        case 'f':
-        case 'F':
-            flip_draw_mode = !flip_draw_mode;
-            break;
         case 'r':
         case 'R':
             record = !record;
             break;
+		case 'w':
+			drawgrid = !drawgrid;
+			break;
+
         }
     }
 }
@@ -321,9 +322,9 @@ int main(int argc, char** argv)
 
     VBO vbo_handle;
 
-	//particleSystem ps(16);//16^3=4096
-	//particleSystem ps(9, 30, 9);//2430
-	particleSystem ps(6,6,6);
+	
+	particleSystem ps(9, 30, 9);//2430
+	//particleSystem ps(6,6,6);
 
     lastTime = glfwGetTime();
     while(run)
@@ -332,22 +333,17 @@ int main(int argc, char** argv)
 
         aimCamera();
 
-       /* if(!pause)
-            cloth_sim.update(&scene, 0.006325f);
-        if(flip_draw_mode)
-        {
-            cloth_sim.flip_draw_mode();
-            flip_draw_mode = false;
-        }*/
         activate_shaderprog(m_shaderprog_handle);
 		
 		
 		ps.Draw(vbo_handle);
-		//ps.drawWireGrid();
+		
 
         deactivate_shaderprog(m_shaderprog_handle);
 
-        drawAxes();
+		/*if(drawgrid)
+			ps.drawWireGrid();
+        drawAxes();*/
         if(!pause && record)
             grabScreen(ps);
         frame_num++;

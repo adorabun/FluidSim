@@ -3,14 +3,14 @@
 #include <fstream>
 #include <iostream>
 
-#define SMOOTH_CORE_RADIUS 0.45f //three times the average distance
+#define SMOOTH_CORE_RADIUS 0.55f //three times the average distance
 
-int particleSystem::nSlice = 8;
-int particleSystem::nStack = 8;
+int particleSystem::nSlice = 10;
+int particleSystem::nStack = 10;
 float particleSystem::radius = 0.15f;
 float particleSystem::surface_tension_coeff = 50.f;//sigma_s
-float particleSystem::interface_tension_coeff = 50.f;//sigma_i
-float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
+float particleSystem::interface_tension_coeff = 20.f;//sigma_i
+float particleSystem::surfaceThreshold = 1.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
 float particleSystem::ystart = 0.f;
@@ -40,10 +40,11 @@ particle::particle(glm::vec3 position, float rho, float tem){
 		vel = glm::vec3(0.0);
 
 		viscosity_coef = 800.f;
-		gas_constant = 100.f;
+		gas_constant = 300.f;
 
 		color_surface = 1.f;
 		color_interface = -0.5f;//water-polar
+		onsurface = false;
 	}
 
 
@@ -66,29 +67,6 @@ particleSystem::particleSystem(int numberX, int numberY, int numberZ){
 	//gridcells.resize(gx, gy, gz, particles);
 	mygrid.dim = glm::vec3(gx,gy,gz);
 }
-//void particleSystem::initParticles(int number){
-//
-//	float stepsize = 2.f * radius;
-//	int total = number * number * number;
-//	
-//	particles.resize(total);
-//	
-//	int id;
-//
-//
-//	for(int x = 0; x < number; x++)
-//		for(int y = 0; y < number; y++)
-//			for(int z = 0; z < number; z++){
-//				id = x*number*number + y*number + z;
-//				
-//				particle* p1 = new particle(glm::vec3(x, y, z) * stepsize + offset1);
-//				p1->id = id;
-//				p1->vel.y = -5.f;
-//				particles[id] = p1;
-//
-//			}
-//
-//}
 
 void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 
@@ -111,6 +89,7 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 
 				particle p1(glm::vec3(x, y, z) * stepsize + offset1, 1000.f, 20.f);
 				p1.id = id;
+				p1.vel.y = -6.f;
 				particles[id] = p1;
 
 			}
@@ -137,6 +116,7 @@ void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 
 				particle pt_oil(glm::vec3(x, y, z) * stepsize + offset1, 800.f, 20.f);
 				pt_oil.id = id;
+				pt_oil.vel.x = 5.f;
 				pt_oil.viscosity_coef = 1000.f;
 				pt_oil.gas_constant = 100.f;
 				pt_oil.color_interface = 0.5f;
@@ -193,7 +173,7 @@ void particleSystem::initSphere(){
 			float z = cos(j*phi);
 
 			int index = i*nSlice+j;
-			m_positions[index] = glm::vec3(x, y, z) * radius * 0.8f;;
+			m_positions[index] = glm::vec3(x, y, z) * radius;
 			m_normals[index] = glm::vec3(x, y, z);
 		}
 
@@ -340,7 +320,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		if( CollisionDectection(target[i], collision_normal) ){
 			glm::vec3 vn = (source[i].vel * collision_normal) * collision_normal;//decompose v along normal
 			glm::vec3 vt = source[i].vel - vn;
-			target[i].vel = 0.9f * vt - 0.8f * vn;//flip normal direction speed
+			target[i].vel = 0.98f * vt - 0.8f * vn;//flip normal direction speed
 			target[i].pos = source[i].pos;
 		}
 
@@ -377,6 +357,7 @@ void particleSystem::LeapfrogIntegrate(float dt){
 		source[i].vel = target[i].vel + halfdt * (target[i].force/target[i].actual_density  + source[i].force /source[i].actual_density);
 		source[i].force = target[i].force;
 		source[i].actual_density = target[i].actual_density;	
+		source[i].onsurface = target[i].onsurface;
 	}
 
 	//double time5 = glfwGetTime();
@@ -390,12 +371,6 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	frameCount++;
 }
 
-bool particleSystem::checkIfOutOfBoundry(const particle& p){
-	glm::vec3 pos = p.pos;
-	if(pos.x < xstart || pos.x > xend || pos.y < ystart || pos.y > yend || pos.z < zstart || pos.z > zend)
-		return true;
-	return false;
-}
 
 bool particleSystem::CollisionDectection(particle& p, glm::vec3& n){
 	n = glm::vec3(0.f);
@@ -403,29 +378,29 @@ bool particleSystem::CollisionDectection(particle& p, glm::vec3& n){
 
 	if(pos.x < xstart){
 		n.x = 1.f;
-		//p.pos.x = xstart + EPSILON;
+		p.pos.x = xstart;
 	}
 	else if(pos.x > xend){
 		n.x = -1.f;
-		//p.pos.x = xend - EPSILON;
+		p.pos.x = xend;
 	}
 
 	if(pos.y < ystart){
 		n.y = 1.f;
-		//p.pos.y = ystart + EPSILON;
+		p.pos.y = ystart;
 	}
 	else if(pos.y > yend){
 		n.y = -1.f;
-		//p.pos.y = yend - EPSILON;
+		p.pos.y = yend;
 	}
 
 	if(pos.z < zstart){
 		n.z = 1.f;
-		//p.pos.z = zstart + EPSILON;
+		p.pos.z = zstart;
 	}
 	else if(pos.z > zend){
 		n.z = -1.f;
-		//p.pos.z = zend - EPSILON;
+		p.pos.z = zend;
 	}
 
 	if(n == glm::vec3(0.f))
@@ -508,7 +483,7 @@ void particleSystem::computeForce(particle& pi){
 	glm::vec3 f_viscosity(0.f);
 	glm::vec3 f_surfaceTension(0.f);
 	glm::vec3 f_interfaceTension(0.f);
-	glm::vec3 f_gravity = glm::vec3(0,-9.8f * 3,0) * pi.actual_density;
+	glm::vec3 f_gravity = glm::vec3(0,-9.8f,0) * pi.actual_density;
 
 	float massOverDensity;
 	glm::vec3 r;
@@ -543,15 +518,23 @@ void particleSystem::computeForce(particle& pi){
 	float Cs_normal_len = glm::length(Cs_normal);
 	float Ci_normal_len = glm::length(Ci_normal);
 	float curvature_s;
+
+	//if(pi.id < 9)
+		//std::cout << "id = "<< pi.id <<"...."<< Cs_normal_len << std::endl;
+
 	if(Cs_normal_len > surfaceThreshold){
+		//std::cout << "id = "<< pi.id <<"...."<< Cs_normal_len << std::endl;
+		pi.onsurface = true;
 		curvature_s =  - Cs_Laplacian / Cs_normal_len;
 	    f_surfaceTension = surface_tension_coeff * curvature_s * Cs_normal;
-	}
+	}else
+		pi.onsurface = false;
 
 	float curvature_i =  - Ci_Laplacian / (Ci_normal_len + 0.000000001f);
 	f_interfaceTension = interface_tension_coeff * curvature_i * Cs_normal;
   
 	pi.force = f_pressure + f_viscosity + f_surfaceTension + f_interfaceTension + f_gravity;
+	//pi.force = f_pressure + f_viscosity + f_gravity;
  
 }
 
@@ -615,10 +598,10 @@ void particleSystem::computeRestDensity(particle& pi, float dt){
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 
-	//if(frameCount > 96 && frameCount <=240 && frameCount%48 == 0)
-		//GenerateParticles(6, 6, 6);
+	/*if(frameCount > 96 && frameCount <=240 && frameCount%48 == 0)
+		GenerateParticles(6, 6, 6);*/
 
-	if(frameCount == 72)
+	if(frameCount > 72 && frameCount <=240 && frameCount%24 == 0)
 		GenerateParticles(6, 6, 6);
 
 	LeapfrogIntegrate(0.01f);
@@ -629,7 +612,9 @@ void particleSystem::Draw(const VBO& vbos){
 
 		for(int i=0; i< m_positions.size(); i++){
 				m_positions[i] += (particles[id].pos);
-				if(id < 216)//2430
+				if( particles[id].onsurface )
+					m_colors[i] = 0.8f * m_colors[i] + 0.2f * glm::vec3(1.f);
+				else if(id < 2430)//2430
 					m_colors[i] = glm::vec3(0.2f,0.5f, 1.f);//blue
 				else
 					m_colors[i] = glm::vec3(0.89f, 0.71f, 0.21f);//oil

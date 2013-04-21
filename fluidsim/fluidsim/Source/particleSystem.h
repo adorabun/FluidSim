@@ -39,7 +39,10 @@ public:
 
 	std::vector<particle*> ngbrs;
 
+	bool onsurface;
+
 };
+
 
 struct Cell{
 	int frameID;
@@ -99,7 +102,6 @@ private:
 	void computeForce(particle& pi);
 	void computeDensity(particle& pi);
 	void computeRestDensity(particle& pi, float dt);
-	bool checkIfOutOfBoundry(const particle& p);
 	bool CollisionDectection(particle& p, glm::vec3& n);
 private:
 	std::vector<particle> particles;
