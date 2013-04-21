@@ -28,8 +28,8 @@ GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
 float eye_distance = 12.f;
-float head = 15.f, pitch = 85.f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(0.0f, 2.0f, 0.0f);
+float head = 0.f, pitch = 90.f;
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(2.0f, 4.0f, 0.0f);
 
 //----------functions----------//
 // declare
@@ -323,8 +323,8 @@ int main(int argc, char** argv)
     VBO vbo_handle;
 
 	//particleSystem ps(16);//16^3=4096
-	//particleSystem ps(9, 30, 9);//1728
-	particleSystem ps(5, 5, 5);
+	particleSystem ps(9, 30, 9);//1728
+	//particleSystem ps(5, 5, 5);
 
     lastTime = glfwGetTime();
     while(run)

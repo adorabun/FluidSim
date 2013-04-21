@@ -10,8 +10,8 @@
 int particleSystem::nSlice = 6;
 int particleSystem::nStack = 6;
 float particleSystem::radius = 0.15f;
-float particleSystem::surface_tension_coeff = 5.f;//sigma_s
-float particleSystem::interface_tension_coeff = 5.f;//sigma_i
+float particleSystem::surface_tension_coeff = 50.f;//sigma_s
+float particleSystem::interface_tension_coeff = 50.f;//sigma_i
 float particleSystem::surfaceThreshold = 0.5f;//l need to figure out value by printing
 
 float particleSystem::xstart = 0.f;
@@ -100,9 +100,9 @@ void particleSystem::initParticles(int numberX, int numberY, int numberZ){
 
 void particleSystem::GenerateParticles(int numberX, int numberY, int numberZ){
 	float stepsize = 2.f * radius;
-	int total = numberX * numberY * numberZ;
+	int total = particles.size();
 	
-	particles.resize(particles.size() + total);
+	particles.resize(total + numberX * numberY * numberZ);
 	
 	int id;
 
@@ -606,7 +606,7 @@ void particleSystem::computeDensity(particle& pi){
 ///////////////////////////////draw related//////////////////////////////////////
 void particleSystem::Draw(const VBO& vbos){
 	
-	if(frameCount == 25)
+	if(frameCount > 200 && frameCount%12 == 0)
 		GenerateParticles(5, 5, 5);
 	
 	LeapfrogIntegrate(0.01f);
