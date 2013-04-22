@@ -165,7 +165,7 @@ double triangleArea(glm::vec3 const& P1, glm::vec3 const& P2, glm::vec3 const& P
 	return area;
 }
 
-bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::vec3& normal)
+bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::vec3& normal, glm::vec3& intersect)
 {
 	//glm::vec3 V = glm::normalize(V0);
 	glm::vec3 dir = p_end - p_start;
@@ -193,7 +193,7 @@ bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::
 		else
 		{
 			t = glm::dot(face_normal, P1 - pos) / denominator;
-			if(t < EPSILON || t > 1.5)
+			if(t < EPSILON || t > 1)
 				continue;
 			else
 			{
@@ -206,6 +206,7 @@ bool Mesh::lineIntersect(glm::vec3 const& p_start, glm::vec3 const& p_end, glm::
 				if((s1 > EPSILON) && (s1 < 1) && (s2 > EPSILON) && (s2 < 1) && (s3 > EPSILON) && (s3 < 1) && (s1 + s2 + s3 - 1 < EPSILON) && (s1 + s2 + s3 - 1 > -EPSILON))
 				{
 					normal = face_normal;
+					intersect = P;
 					return true;
 				}
 			}

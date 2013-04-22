@@ -347,13 +347,13 @@ void particleSystem::LeapfrogIntegrate(float dt){
 	std::vector<particle> target = particles;// target is a copy!
 	std::vector<particle>& source = particles;//source is a ptr!
 	glm::vec3 collision_normal = glm::vec3(0.f);
-
+	glm::vec3 collision_intersect = glm::vec3(0.f);
 	
 	//double time0 = glfwGetTime();
 	for (int i=0; i < target.size(); i++){
 		target[i].pos = source[i].pos + source[i].vel * dt 
 						+ halfdt * dt * source[i].force / source[i].actual_density;
-		if(container->lineIntersect(source[i].pos, target[i].pos, collision_normal) ){
+		if(container->lineIntersect(source[i].pos, target[i].pos, collision_normal, collision_intersect) ){
 		//if( CollisionDectection(target[i], collision_normal) ){
 			glm::vec3 vn = (source[i].vel * collision_normal) * collision_normal;//decompose v along normal
 			glm::vec3 vt = source[i].vel - vn;
@@ -736,6 +736,7 @@ void particleSystem::outputCenter(int& i_frame, char* s_file)
 	else
 		io_out.open(s_file, std::ios::app);
 	io_out<<i_frame<<" ";
+	io_out<<particles.size()<<" ";
 	glm::vec3 center = glm::vec3(0.0,0.0,0.0);
 	for (int id=0; id<particles.size(); id++ )
 	{

@@ -27,8 +27,8 @@ GLuint m_vert_handle, m_frag_handle, m_shaderprog_handle;
 
 //----------Camera Control----------//
 float eye_distance = 13.f;
-float head = 20.f, pitch = -90.f;
-glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(8.0f, 5.0f, 2.0f);
+float head = 25.f, pitch = -90.f;
+glm::vec3 cam_pos, up(0.0f, 1.0f, 0.0f), lookat(8.0f, 6.0f, 2.0f);
 
 //----------functions----------//
 // declare
@@ -39,7 +39,7 @@ void mouseMotion(int x, int y);
 void keypress(int key, int action);
 void aimCamera(void);
 void drawAxes(void);
-void grabScreen(void);
+void grabScreen(particleSystem& ps);
 
 void activate_shaderprog(GLuint shaderprog);
 void deactivate_shaderprog(GLuint shaderprog);
@@ -238,7 +238,7 @@ void aimCamera(void)
     glUniformMatrix4fv(m_uniform_location[1], 1, false, &projection[0][0]);
 }
 
-void grabScreen(const particleSystem& ps)
+void grabScreen(particleSystem& ps)
 {
     unsigned char* bitmapData = new unsigned char[3 * window_width * window_height];
 
@@ -254,7 +254,8 @@ void grabScreen(const particleSystem& ps)
     stbi_write_png(anim_filename, window_width, window_height, 3, bitmapData, window_width * 3);
 
     delete [] bitmapData;
-	//ps.outputCenter(frame_num, "output/output.txt");
+
+	ps.outputCenter(frame_num, "output/output.txt");
 }
 
 void activate_shaderprog(GLuint shaderprog)
